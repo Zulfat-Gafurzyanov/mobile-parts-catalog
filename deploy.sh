@@ -1,14 +1,14 @@
 #!/bin/bash
 
-# Загружаем переменные из .env (ищем в корне)
-if [ -f .env ]; then
-    export $(cat .env | grep -v '^#' | xargs)
+# Загружаем переменные из .env (ищем в backend/ или корне)
+if [ -f backend/.env ]; then
+    export $(cat backend/.env | grep -v '^#' | xargs)
 elif [ -f .env ]; then
     export $(cat .env | grep -v '^#' | xargs)
 else
     echo "❌ Файл .env не найден!"
     echo "Создайте его из .env.example:"
-    echo "cp .env.example .env"
+    echo "cp backend/.env.example backend/.env"
     exit 1
 fi
 
@@ -38,14 +38,14 @@ version: '3.8'
 services:
   api:
     build:
-      context: .
+      context: ./backend
       dockerfile: Dockerfile
     container_name: mobile-parts-api
     ports:
       - "5000:5000"
     volumes:
       - ./input_data:/app/input_data:ro
-      - ./logs:/app/logs
+      - ./backend/logs:/app/logs
     environment:
       - FLASK_ENV=production
       - PYTHONUNBUFFERED=1
@@ -68,7 +68,7 @@ EOL
         --exclude='.git' \
         --exclude='*.log' \
         --exclude='telegram_bot' \
-        input_data/ docker-compose.prod.yml 2>/dev/null || true
+        backend/ input_data/ docker-compose.prod.yml 2>/dev/null || true
     
     # 3. Копируем на сервер
     echo "📤 Копируем файлы на сервер..."
@@ -76,8 +76,8 @@ EOL
     $SCP_CMD deploy.tar.gz $SERVER_USER@$SERVER_IP:$REMOTE_DIR/
     
     # 4. Копируем .env файл если есть
-    if [ -f .env ]; then
-        $SCP_CMD .env $SERVER_USER@$SERVER_IP:$REMOTE_DIR/
+    if [ -f backend/.env ]; then
+        $SCP_CMD backend/.env $SERVER_USER@$SERVER_IP:$REMOTE_DIR/backend/
     fi
     
     # 5. Разворачиваем на сервере
@@ -88,7 +88,7 @@ EOL
         rm deploy.tar.gz
         
         # Создаем директорию для логов
-        mkdir -p /logs
+        mkdir -p backend/logs
         
         # Проверяем наличие input_data
         if [ ! -d input_data ]; then
