@@ -12,11 +12,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Копируем файл требований
 COPY requirements.txt .
 
-# Обновляем pip и устанавливаем зависимости включая openpyxl
+# Обновляем pip и устанавливаем зависимости
 RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt && \
-    pip install --no-cache-dir openpyxl
-
 # Копируем исходный код приложения
 COPY . .
 
