@@ -1,40 +1,79 @@
 from flask import Flask, jsonify
 import pandas as pd
+import os
+import logging
 
 app = Flask(__name__)
 
+# Настройка логирования
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
+
+# Путь к файлу
+EXCEL_FILE_PATH = os.path.join('input_data', 'Остатки (4).xlsx')
+
+@app.route('/health', methods=['GET'])
+def health_check():
+    """Проверка состояния сервиса"""
+    return jsonify({"status": "healthy"}), 200
 
 @app.route('/api/get_data', methods=['GET'])
 def get_data():
-    # Чтение данных из XLSX-файла
-    df = pd.read_excel('input_data/Остатки (4).xlsx', engine='openpyxl')
+    try:
+        # Проверка существования файла
+        if not os.path.exists(EXCEL_FILE_PATH):
+            logger.error(f"File not found: {EXCEL_FILE_PATH}")
+            return jsonify({"error": "Data file not found"}), 404
+        
+        # Чтение данных из XLSX-файла
+        df = pd.read_excel(EXCEL_FILE_PATH, engine='openpyxl')
+        logger.info(f"Successfully loaded {len(df)} rows from Excel file")
 
-    technics_dict = {}  # Словарь моделей с соответствующими данными
-    specific_column_model = 'Полная группа'
+        technics_dict = {}
+        specific_column_model = 'Полная группа'
 
-    # Перебираем каждую строку
-    for _, row in df.iterrows():
-        row_parts = row[specific_column_model].split('/')
-        model = row_parts[1]  # Берём второй элемент (модель)
+        # Проверка наличия нужной колонки
+        if specific_column_model not in df.columns:
+            logger.error(f"Column '{specific_column_model}' not found in Excel file")
+            return jsonify({"error": f"Required column '{specific_column_model}' not found"}), 400
 
-        # Формируем словарь для текущей строки
-        model_dict = {}
-        for col_name in df.columns:
-            # Если значение NaN, заменяем его на null
-            value = row[col_name]
-            if pd.isna(value):  # Проверяем на NaN независимо от типа данных
-                value = None
-            model_dict[col_name] = value
+        # Перебираем каждую строку
+        for idx, row in df.iterrows():
+            try:
+                row_parts = row[specific_column_model].split('/')
+                if len(row_parts) >= 2:
+                    model = row_parts[1]
+                else:
+                    logger.warning(f"Skipping row {idx}: invalid format in '{specific_column_model}'")
+                    continue
 
-        # Если такая модель уже существует, добавляем новую строку
-        if model in technics_dict:
-            technics_dict[model].append(model_dict)
-        else:
-            # Иначе создаем новый список с одним элементом
-            technics_dict[model] = [model_dict]
+                # Формируем словарь для текущей строки
+                model_dict = {}
+                for col_name in df.columns:
+                    value = row[col_name]
+                    if pd.isna(value):
+                        value = None
+                    model_dict[col_name] = value
 
-    return jsonify(technics_dict)
+                # Добавляем в результирующий словарь
+                if model in technics_dict:
+                    technics_dict[model].append(model_dict)
+                else:
+                    technics_dict[model] = [model_dict]
+                    
+            except Exception as e:
+                logger.warning(f"Error processing row {idx}: {str(e)}")
+                continue
 
+        logger.info(f"Successfully processed data for {len(technics_dict)} models")
+        return jsonify(technics_dict), 200
+
+    except Exception as e:
+        logger.error(f"Error processing request: {str(e)}")
+        return jsonify({"error": "Internal server error"}), 500
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=False)

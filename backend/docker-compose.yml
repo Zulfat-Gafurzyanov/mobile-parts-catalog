@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  mobile-parts-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: mobile-parts-catalog
+    ports:
+      - "5000:5000"
+    volumes:
+      # Монтируем директорию с данными для обновления без пересборки
+      - ./input_data:/app/input_data:ro
+      # Опционально: монтируем логи
+      - ./logs:/app/logs
+    environment:
+      - FLASK_ENV=production
+      - PYTHONUNBUFFERED=1
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/api/get_data"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Опционально: добавляем nginx как reverse proxy
+  nginx:
+    image: nginx:alpine
+    container_name: mobile-parts-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      # Для SSL сертификатов
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - mobile-parts-api
+    restart: unless-stopped
+
+networks:
+  default:
+    name: mobile-parts-network
