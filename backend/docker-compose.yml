@@ -1,23 +1,19 @@
 version: '3.8'
 
 services:
-  mobile-parts-api:
+  api:
     build:
-      context: ..
-      dockerfile: backend/Dockerfile
-    image: mobile-parts-api:${DOCKER_IMAGE_TAG:-latest}
-    container_name: mobile-parts-catalog
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: mobile-parts-api
     ports:
       - "5000:5000"
     volumes:
-      # Монтируем директорию с данными для обновления без пересборки
-      - ../input_data:/app/input_data:ro
-      # Логи
-      - ./logs:/app/logs
+      - ./input_data:/app/input_data:ro
+      - ./backend/logs:/app/logs
     environment:
-      - FLASK_ENV=${FLASK_ENV:-production}
-      - PYTHONUNBUFFERED=${PYTHONUNBUFFERED:-1}
-      - SECRET_KEY=${SECRET_KEY}
+      - FLASK_ENV=production
+      - PYTHONUNBUFFERED=1
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
@@ -25,25 +21,3 @@ services:
       timeout: 10s
       retries: 3
       start_period: 40s
-    networks:
-      - mobile-parts-network
-
-  nginx:
-    image: nginx:alpine
-    container_name: mobile-parts-nginx
-    ports:
-      - "${NGINX_HTTP_PORT:-80}:80"
-      - "${NGINX_HTTPS_PORT:-443}:443"
-    volumes:
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./ssl:/etc/nginx/ssl:ro
-      - ./nginx/logs:/var/log/nginx
-    depends_on:
-      - mobile-parts-api
-    restart: unless-stopped
-    networks:
-      - mobile-parts-network
-
-networks:
-  mobile-parts-network:
-    driver: bridge
