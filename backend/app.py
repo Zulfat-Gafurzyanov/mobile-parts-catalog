@@ -11,8 +11,8 @@ env = Env()
 env.read_env()
 app = Flask(__name__)
 
-server_ip = env.str("SERVER_IP")
 # Настройка CORS
+server_ip = env.str("SERVER_IP")
 CORS(app,
      origins=[
          "https://web.telegram.org",  # Telegram Web Apps
