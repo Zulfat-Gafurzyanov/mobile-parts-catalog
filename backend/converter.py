@@ -79,6 +79,8 @@ class ExcelToJsonConverter:
             # Читаем Excel файл
             self.log("Читаем Excel файл...")
             df = pd.read_excel(xlsx_path, engine='openpyxl')
+            # Убираем лишние пробелы в названиях колонок
+            df.columns = df.columns.str.strip()
             # Заменяем все NaN на None
             df = df.replace({pd.NA: None, pd.NaT: None, float('nan'): None})
             df = df.where(pd.notnull(df), None)
@@ -91,12 +93,8 @@ class ExcelToJsonConverter:
                 # Читаем данные из строки - только существующие колонки
                 brand = str(row.get('Бренд', ''))
                 name = str(row.get('Наименование', ''))
+                cost = float(row.get('Цена', ''))
                 stock = int(row.get('Остаток', 0))
-                modification = str(row.get('Модификация', ''))
-                barcode = str(row.get('Штрихкоды', ''))
-                article = str(row.get('Артикул', ''))
-                full_group = str(row.get('Полная группа', ''))
-                group_name = str(row.get('Название группы', ''))
                 discription = str(row.get('Описание', ''))
                 photo = str(row.get('Фото', ''))
 
@@ -104,12 +102,8 @@ class ExcelToJsonConverter:
                 item = {
                     'Бренд': brand,
                     'Наименование': name,
+                    'Цена': cost,
                     'Остаток': stock,
-                    'Модификация': modification,
-                    'Артикул': article,
-                    'Штрихкоды': barcode,
-                    'Полная группа': full_group,
-                    'Название группы': group_name,
                     'Описание': discription,
                     'Фото': photo,
                 }
