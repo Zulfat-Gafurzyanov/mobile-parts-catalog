@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Каталог запчастей</title>
+    
+    <!-- Telegram Web App Script -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    
+    <!-- Стили -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Шапка приложения -->
+    <header class="header">
+        <div class="header-content">
+            <h1>📱 Каталог запчастей</h1>
+            <div class="stats">
+                <div class="stat-item">
+                    <span class="stat-label">Всего товаров:</span>
+                    <span class="stat-value" id="totalItems">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">В наличии:</span>
+                    <span class="stat-value" id="inStock">0</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Поиск -->
+    <div class="search-container">
+        <input 
+            type="text" 
+            class="search-input" 
+            id="searchInput" 
+            placeholder="🔍 Поиск по названию или модели..."
+        >
+    </div>
+
+    <!-- Фильтр по категориям -->
+    <div class="categories-container">
+        <div class="categories-header">
+            <h3>Категории</h3>
+            <button class="clear-filter" id="clearFilter">Сбросить</button>
+        </div>
+        <div class="categories" id="categoriesContainer">
+            <!-- Категории будут добавлены динамически -->
+        </div>
+    </div>
+
+    <!-- Фильтр по наличию -->
+    <div class="availability-filter">
+        <label class="checkbox-container">
+            <input type="checkbox" id="inStockOnly">
+            <span class="checkmark"></span>
+            <span>Только в наличии</span>
+        </label>
+    </div>
+
+    <!-- Счетчик результатов -->
+    <div class="results-counter">
+        <span id="resultsCount">Показано: 0 товаров</span>
+    </div>
+
+    <!-- Сетка товаров -->
+    <div class="products-grid" id="productsGrid">
+        <!-- Карточки товаров будут добавлены динамически -->
+    </div>
+
+    <!-- Индикатор загрузки -->
+    <div class="loader" id="loader">
+        <div class="spinner"></div>
+        <span>Загрузка товаров...</span>
+    </div>
+
+    <!-- Кнопка "Показать еще" для пагинации -->
+    <div class="load-more-container" id="loadMoreContainer">
+        <button class="load-more-btn" id="loadMoreBtn">Показать еще</button>
+    </div>
+
+    <!-- Модальное окно с деталями товара -->
+    <div class="modal" id="productModal">
+        <div class="modal-content">
+            <button class="modal-close" id="modalClose">&times;</button>
+            
+            <div class="modal-body">
+                <div class="modal-image-container">
+                    <img id="modalImage" src="" alt="Фото товара">
+                    <div class="no-image" id="modalNoImage">
+                        <span>📷</span>
+                        <p>Нет фото</p>
+                    </div>
+                </div>
+                
+                <div class="modal-info">
+                    <h2 id="modalTitle"></h2>
+                    <div class="modal-details">
+                        <div class="detail-item">
+                            <span class="detail-label">Бренд:</span>
+                            <span class="detail-value" id="modalBrand"></span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Категория:</span>
+                            <span class="detail-value" id="modalCategory"></span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Артикул:</span>
+                            <span class="detail-value" id="modalArticle"></span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Штрихкод:</span>
+                            <span class="detail-value" id="modalBarcode"></span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Наличие:</span>
+                            <span class="detail-value">
+                                <span class="stock-badge" id="modalStock"></span>
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="modal-price" id="modalPrice">
+                        <!-- Цена будет добавлена когда она появится в данных -->
+                    </div>
+                    
+                    <div class="modal-description" id="modalDescription">
+                        <!-- Описание если есть -->
+                    </div>
+                    
+                    <div class="modal-actions">
+                        <button class="btn btn-primary" id="orderBtn">
+                            📝 Заказать
+                        </button>
+                        <button class="btn btn-secondary" id="shareBtn">
+                            📤 Поделиться
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Пустое состояние -->
+    <div class="empty-state" id="emptyState">
+        <div class="empty-icon">🔍</div>
+        <h3>Ничего не найдено</h3>
+        <p>Попробуйте изменить параметры поиска или фильтры</p>
+    </div>
+
+    <!-- Скрипты -->
+    <script src="app.js"></script>
+</body>
+</html>
