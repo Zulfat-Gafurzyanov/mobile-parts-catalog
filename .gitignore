@@ -177,5 +177,6 @@ pyrightconfig.json
 public_html
 *.xlsx
 .last_hash
+*.json
 
 # End of https://www.toptal.com/developers/gitignore/api/python
