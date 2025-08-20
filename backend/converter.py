@@ -2,7 +2,6 @@ from datetime import datetime
 import hashlib
 import json
 import os
-import re
 
 import pandas as pd
 
@@ -72,9 +71,9 @@ class ExcelToJsonConverter:
                 self.log(f"Файл {xlsx_path} не найден!", 'ERROR')
                 return False
 
-            # Проверяем, изменился ли файл
-            if not self.check_file_changed():
-                return True
+            # # Проверяем, изменился ли файл
+            # if not self.check_file_changed():
+            #     return True
 
             # Читаем Excel файл
             self.log("Читаем Excel файл...")
@@ -118,12 +117,12 @@ class ExcelToJsonConverter:
             }
 
             # Сохраняем JSON с отступами для читаемости
-
-            json_path = os.path.join('json_data', CONFIG['json_file'])
+            project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+            json_path = os.path.join(project_root, 'frontend', CONFIG['json_file'])
             with open(json_path, 'w', encoding='utf-8') as f:
                 json.dump(result, f, ensure_ascii=False, indent=2)
 
-            self.log(f"Конвертация завершена успешно. Обработано {len(catalog)} товаров")
+            self.log("Конвертация завершена успешно")
             self.log(f"JSON сохранен в: {CONFIG['json_file']}")
 
             return True
