@@ -71,9 +71,9 @@ class ExcelToJsonConverter:
                 self.log(f"Файл {xlsx_path} не найден!", 'ERROR')
                 return False
 
-            # # Проверяем, изменился ли файл
-            # if not self.check_file_changed():
-            #     return True
+            # Проверяем, изменился ли файл (раскомментировано)
+            if not self.check_file_changed():
+                return True
 
             # Читаем Excel файл
             self.log("Читаем Excel файл...")
@@ -92,7 +92,7 @@ class ExcelToJsonConverter:
                 # Читаем данные из строки - только существующие колонки
                 brand = str(row.get('Бренд', ''))
                 name = str(row.get('Наименование', ''))
-                cost = float(row.get('Цена', ''))
+                cost = float(row.get('Цена', 0))
                 stock = int(row.get('Остаток', 0))
                 discription = str(row.get('Описание', ''))
                 photo = str(row.get('Фото', ''))
@@ -117,13 +117,15 @@ class ExcelToJsonConverter:
             }
 
             # Сохраняем JSON с отступами для читаемости
-            project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-            json_path = os.path.join(project_root, 'frontend', CONFIG['json_file'])
+            project_root = os.path.dirname(
+                os.path.dirname(os.path.abspath(__file__)))
+            json_path = os.path.join(
+                project_root, 'frontend', CONFIG['json_file'])
             with open(json_path, 'w', encoding='utf-8') as f:
                 json.dump(result, f, ensure_ascii=False, indent=2)
 
             self.log("Конвертация завершена успешно")
-            self.log(f"JSON сохранен в: {CONFIG['json_file']}")
+            self.log(f"JSON сохранен в: {json_path}")
 
             return True
 
@@ -134,11 +136,17 @@ class ExcelToJsonConverter:
     def validate_json(self):
         """Валидация созданного JSON файла"""
         try:
-            with open(CONFIG['json_file'], 'r', encoding='utf-8') as f:
+            # Используем тот же путь, что и при сохранении
+            project_root = os.path.dirname(
+                os.path.dirname(os.path.abspath(__file__)))
+            json_path = os.path.join(
+                project_root, 'frontend', CONFIG['json_file'])
+
+            with open(json_path, 'r', encoding='utf-8') as f:
                 data = json.load(f)
 
-            # Проверяем структуру
-            required_fields = ['success', 'timestamp', 'items']
+            # Проверяем структуру - исправлены поля на правильные
+            required_fields = ['generated_at', 'total_items', 'items']
             for field in required_fields:
                 if field not in data:
                     self.log(
@@ -148,10 +156,32 @@ class ExcelToJsonConverter:
             # Проверяем, что есть товары
             if len(data['items']) == 0:
                 self.log("JSON не содержит товаров!", 'WARNING')
+            else:
+                # Проверяем структуру товаров
+                if len(data['items']) > 0:
+                    item_fields = [
+                        'Бренд',
+                        'Наименование',
+                        'Цена',
+                        'Остаток',
+                        'Описание',
+                        'Фото'
+                    ]
+                    sample_item = data['items'][0]
+                    for field in item_fields:
+                        if field not in sample_item:
+                            self.log(
+                                f"Отсутствует поле: {field}", 'WARNING')
 
             self.log("Валидация JSON прошла успешно")
             return True
 
+        except FileNotFoundError:
+            self.log(f"Файл JSON не найден: {json_path}", 'ERROR')
+            return False
+        except json.JSONDecodeError as e:
+            self.log(f"Ошибка парсинга JSON: {e}", 'ERROR')
+            return False
         except Exception as e:
             self.log(f"Ошибка валидации JSON: {e}", 'ERROR')
             return False
@@ -164,8 +194,10 @@ def main():
     # Выполняем конвертацию
     if converter.convert_excel_to_json():
         # Валидируем результат
-        converter.validate_json()
-        print("Конвертация завершена успешно")
+        if converter.validate_json():
+            print("Конвертация и валидация завершены успешно")
+        else:
+            print("Конвертация выполнена, но валидация не прошла.")
     else:
         print("Ошибка при конвертации. Проверьте логи.")
 
