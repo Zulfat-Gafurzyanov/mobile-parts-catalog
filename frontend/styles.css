@@ -111,23 +111,23 @@ body {
 }
 
 /* ====================== */
-/* Категории */
+/* Бренды */
 /* ====================== */
 
-.categories-container {
+.brands-container {
     padding: 15px;
     background: white;
     border-bottom: 1px solid var(--border-color);
 }
 
-.categories-header {
+.brands-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 12px;
 }
 
-.categories-header h3 {
+.brands-header h3 {
     font-size: 16px;
     font-weight: 600;
     color: var(--tg-theme-text-color);
@@ -148,13 +148,13 @@ body {
     background: rgba(36, 129, 204, 0.1);
 }
 
-.categories {
+.brands {
     display: flex;
     gap: 8px;
     flex-wrap: wrap;
 }
 
-.category-chip {
+.brand-chip {
     padding: 8px 16px;
     background: var(--tg-theme-secondary-bg-color);
     border: 1px solid var(--border-color);
@@ -168,18 +168,18 @@ body {
     white-space: nowrap;
 }
 
-.category-chip:hover {
+.brand-chip:hover {
     background: #e8e8e8;
     transform: translateY(-1px);
 }
 
-.category-chip.active {
+.brand-chip.active {
     background: var(--tg-theme-button-color);
     color: white;
     border-color: var(--tg-theme-button-color);
 }
 
-.category-count {
+.brand-count {
     background: rgba(0,0,0,0.1);
     padding: 2px 6px;
     border-radius: 10px;
@@ -187,7 +187,7 @@ body {
     font-weight: 600;
 }
 
-.category-chip.active .category-count {
+.brand-chip.active .brand-count {
     background: rgba(255,255,255,0.3);
 }
 
@@ -301,16 +301,24 @@ body {
     box-shadow: var(--shadow-lg);
 }
 
-.product-image {
+.product-image-wrapper {
     width: 100%;
     height: 140px;
-    object-fit: cover;
+    position: relative;
+    overflow: hidden;
     background: var(--tg-theme-secondary-bg-color);
+}
+
+.product-image {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    background: white;
 }
 
 .no-image {
     width: 100%;
-    height: 140px;
+    height: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -352,18 +360,24 @@ body {
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
+    min-height: 34px;
 }
 
-.product-model {
+.product-stock {
     font-size: 12px;
-    color: var(--tg-theme-hint-color);
     margin-bottom: 8px;
+    font-weight: 500;
+}
+
+.product-stock.in-stock {
+    color: var(--success-color);
+}
+
+.product-stock.out-of-stock {
+    color: var(--danger-color);
 }
 
 .product-footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
     padding-top: 8px;
     border-top: 1px solid var(--border-color);
 }
@@ -372,23 +386,6 @@ body {
     font-size: 16px;
     font-weight: 600;
     color: var(--tg-theme-text-color);
-}
-
-.stock-badge {
-    padding: 3px 8px;
-    border-radius: 12px;
-    font-size: 11px;
-    font-weight: 500;
-}
-
-.stock-badge.in-stock {
-    background: rgba(76, 175, 80, 0.1);
-    color: var(--success-color);
-}
-
-.stock-badge.out-of-stock {
-    background: rgba(244, 67, 54, 0.1);
-    color: var(--danger-color);
 }
 
 /* ====================== */
@@ -468,12 +465,16 @@ body {
     height: 250px;
     background: var(--tg-theme-secondary-bg-color);
     position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .modal-image-container img {
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: contain;
+    background: white;
 }
 
 .modal-image-container .no-image {
@@ -515,6 +516,23 @@ body {
     max-width: 60%;
 }
 
+.stock-badge {
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.stock-badge.in-stock {
+    background: rgba(76, 175, 80, 0.1);
+    color: var(--success-color);
+}
+
+.stock-badge.out-of-stock {
+    background: rgba(244, 67, 54, 0.1);
+    color: var(--danger-color);
+}
+
 .modal-price {
     font-size: 24px;
     font-weight: 700;
@@ -533,6 +551,12 @@ body {
     border-radius: 8px;
     font-size: 14px;
     line-height: 1.6;
+}
+
+.modal-description h4 {
+    margin-bottom: 8px;
+    font-size: 15px;
+    font-weight: 600;
 }
 
 .modal-actions {
@@ -567,16 +591,6 @@ body {
 
 .btn-primary:hover {
     background: #1e6ba8;
-    transform: translateY(-1px);
-}
-
-.btn-secondary {
-    background: var(--tg-theme-secondary-bg-color);
-    color: var(--tg-theme-text-color);
-}
-
-.btn-secondary:hover {
-    background: #e0e0e0;
     transform: translateY(-1px);
 }
 
@@ -685,7 +699,11 @@ body {
         max-height: 95vh;
     }
     
-    .modal-actions {
-        flex-direction: column;
+    .product-image-wrapper {
+        height: 120px;
+    }
+    
+    .modal-image-container {
+        height: 200px;
     }
 }
