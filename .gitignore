@@ -210,4 +210,8 @@ public_html/
 # Git hooks
 .git/hooks/
 
-#
+# Файлы проекта
+*.xlsx
+*.json
+*.log
+*.last_hash
