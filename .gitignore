@@ -214,4 +214,4 @@ public_html/
 *.xlsx
 *.json
 *.log
-.last_hash
+*.last_hash

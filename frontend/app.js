@@ -7,31 +7,43 @@ let filteredProducts = [];
 let currentCategory = null;
 let currentBrand = null;
 let currentPage = 1;
-const itemsPerPage = 12;
+const itemsPerPage = 8; // Изменено на 8 товаров
 let searchTimeout = null;
 
 // ====================== 
 // Инициализация Telegram Web App
 // ======================
 
-const tg = window.Telegram.WebApp;
+const tg = window.Telegram ? window.Telegram.WebApp : null;
 
 // Настройка темы Telegram
 function setupTelegramTheme() {
+    if (!tg) return;
+    
     tg.ready();
     tg.expand();
     
-    // Применяем цвета темы Telegram
+    // Применяем цвета темы Telegram с мягкой палитрой
     const theme = tg.themeParams;
     if (theme) {
-        document.documentElement.style.setProperty('--tg-theme-bg-color', theme.bg_color || '#ffffff');
-        document.documentElement.style.setProperty('--tg-theme-text-color', theme.text_color || '#000000');
-        document.documentElement.style.setProperty('--tg-theme-hint-color', theme.hint_color || '#999999');
-        document.documentElement.style.setProperty('--tg-theme-link-color', theme.link_color || '#2481cc');
-        document.documentElement.style.setProperty('--tg-theme-button-color', theme.button_color || '#2481cc');
+        document.documentElement.style.setProperty('--tg-theme-bg-color', theme.bg_color || '#F8F9FA');
+        document.documentElement.style.setProperty('--tg-theme-text-color', theme.text_color || '#2C3E50');
+        document.documentElement.style.setProperty('--tg-theme-hint-color', theme.hint_color || '#6C757D');
+        document.documentElement.style.setProperty('--tg-theme-link-color', theme.link_color || '#5E72E4');
+        document.documentElement.style.setProperty('--tg-theme-button-color', theme.button_color || '#5E72E4');
         document.documentElement.style.setProperty('--tg-theme-button-text-color', theme.button_text_color || '#ffffff');
-        document.documentElement.style.setProperty('--tg-theme-secondary-bg-color', theme.secondary_bg_color || '#f1f1f1');
+        document.documentElement.style.setProperty('--tg-theme-secondary-bg-color', theme.secondary_bg_color || '#F0F2F5');
     }
+}
+
+// ====================== 
+// Форматирование цены
+// ======================
+
+function formatPrice(price) {
+    // Преобразуем в число и форматируем с 2 знаками после запятой
+    const numPrice = parseFloat(price) || 0;
+    return numPrice.toFixed(2).replace('.', ',');
 }
 
 // ====================== 
@@ -80,16 +92,26 @@ function processCatalogData() {
     catalogData.items = catalogData.items.map(item => {
         // Извлекаем модель телефона из названия
         const modelMatch = item['Наименование'].match(/для\s+([^с]+?)(?:\s+с\s+|\s+модуль|\s+плата|$)/i);
-        const phoneModel = modelMatch ? modelMatch[1].trim() : item['Бренд'];
+        const phoneModel = modelMatch ? modelMatch[1].trim() : '';
         
         // Используем цену из данных
-        const price = item['Цена'] || 0;
+        const price = parseFloat(item['Цена']) || 0;
+        
+        // Исправляем бренд, если он None или пустой
+        let brand = item['Бренд'];
+        if (!brand || brand === 'None') {
+            // Пытаемся извлечь бренд из названия
+            const brandMatch = item['Наименование'].match(/^(iPhone|iPad|Samsung|Xiaomi|Huawei|OnePlus|Apple|Google|Sony|LG|Nokia|Motorola|Realme|Oppo|Vivo)/i);
+            brand = brandMatch ? brandMatch[1] : 'Не указан';
+        }
         
         return {
             ...item,
+            'Бренд': brand,
             phoneModel: phoneModel,
             price: price,
-            searchText: `${item['Бренд']} ${item['Наименование']} ${phoneModel}`.toLowerCase()
+            formattedPrice: formatPrice(price),
+            searchText: `${brand} ${item['Наименование']} ${phoneModel}`.toLowerCase()
         };
     });
     
@@ -121,7 +143,7 @@ function createBrandFilters() {
     
     catalogData.items.forEach(item => {
         const brand = item['Бренд'];
-        if (brand && brand !== 'None') {
+        if (brand && brand !== 'None' && brand !== 'Не указан') {
             if (!brandsMap.has(brand)) {
                 brandsMap.set(brand, 0);
             }
@@ -132,7 +154,10 @@ function createBrandFilters() {
     // Создаем чипы брендов
     brandsContainer.innerHTML = '';
     
-    brandsMap.forEach((count, brand) => {
+    // Сортируем бренды по количеству товаров
+    const sortedBrands = Array.from(brandsMap.entries()).sort((a, b) => b[1] - a[1]);
+    
+    sortedBrands.forEach(([brand, count]) => {
         const chip = document.createElement('div');
         chip.className = 'brand-chip';
         chip.innerHTML = `
@@ -270,6 +295,8 @@ function displayProducts() {
     // Показываем/скрываем кнопку "Показать еще"
     if (endIndex < filteredProducts.length) {
         loadMoreContainer.classList.add('visible');
+        const remainingItems = filteredProducts.length - endIndex;
+        document.getElementById('loadMoreBtn').textContent = `Показать еще (${remainingItems})`;
     } else {
         loadMoreContainer.classList.remove('visible');
     }
@@ -310,7 +337,7 @@ function createProductCard(product) {
                 ${stockText}
             </div>
             <div class="product-footer">
-                <div class="product-price">${product.price.toLocaleString('ru-RU')} ₽</div>
+                <div class="product-price">${product.formattedPrice} ₽</div>
             </div>
         </div>
     `;
@@ -358,8 +385,8 @@ function showProductDetails(product) {
         `;
     }
     
-    // Цена
-    document.getElementById('modalPrice').innerHTML = `${product.price.toLocaleString('ru-RU')} ₽`;
+    // Цена с форматированием
+    document.getElementById('modalPrice').innerHTML = `${product.formattedPrice} ₽`;
     
     // Описание
     const descriptionElement = document.getElementById('modalDescription');
