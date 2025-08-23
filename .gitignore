@@ -209,3 +209,8 @@ public_html/
 
 # Git hooks
 .git/hooks/
+
+# Скрипты для проверки статуса
+check_status.sh
+start_bot.sh
+stop_bot.sh
