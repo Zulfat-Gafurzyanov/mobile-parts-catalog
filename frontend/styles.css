@@ -38,7 +38,7 @@
 
 body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-    background: #FFFFFF;
+    background: #FFFFFF !important;
     color: var(--tg-theme-text-color);
     min-height: 100vh;
     overflow-x: hidden;
@@ -170,11 +170,11 @@ body {
 
 .brand-chip {
     padding: 8px 16px;
-    background: #F5F7FA;
-    border: 1px solid #E5E7EB;
+    background: #F5F7FA !important;
+    border: 1px solid #E5E7EB !important;
     border-radius: 20px;
     font-size: 14px;
-    color: #374151;
+    color: #374151 !important;
     cursor: pointer;
     transition: all 0.2s ease;
     display: flex;
@@ -184,14 +184,14 @@ body {
 }
 
 .brand-chip:hover {
-    background: #E5E7EB;
-    border-color: #D1D5DB;
+    background: #E5E7EB !important;
+    border-color: #D1D5DB !important;
 }
 
 .brand-chip.active {
-    background: var(--primary-color);
-    color: white;
-    border-color: var(--primary-color);
+    background: var(--primary-color) !important;
+    color: white !important;
+    border-color: var(--primary-color) !important;
 }
 
 .brand-count {
@@ -269,6 +269,7 @@ body {
     color: var(--tg-theme-text-color);
     display: inline-block !important;
     visibility: visible !important;
+    opacity: 1 !important;
 }
 
 /* ====================== */
@@ -312,7 +313,7 @@ body {
 }
 
 /* ====================== */
-/* Карточка товара - ИСПРАВЛЕНО НАЛОЖЕНИЕ */
+/* Карточка товара */
 /* ====================== */
 
 .product-card {
@@ -355,7 +356,7 @@ body {
     position: relative;
     overflow: hidden;
     background: #F5F7FA;
-    flex: 0 0 160px; /* Фиксированная высота, не растягивается и не сжимается */
+    flex: 0 0 160px;
 }
 
 .product-image {
@@ -424,6 +425,7 @@ body {
     visibility: visible !important;
     word-wrap: break-word;
     overflow-wrap: break-word;
+    opacity: 1 !important;
 }
 
 .product-stock {
@@ -452,6 +454,7 @@ body {
     color: var(--tg-theme-text-color) !important;
     display: block !important;
     visibility: visible !important;
+    opacity: 1 !important;
 }
 
 /* ====================== */
@@ -524,16 +527,31 @@ body {
 .modal-body {
     overflow-y: auto;
     max-height: 90vh;
+    display: flex;
+    flex-direction: column;
 }
 
 .modal-image-container {
     width: 100%;
-    height: 250px;
     background: #F5F7FA;
     position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
+    flex-shrink: 0;
+    transition: height 0.3s ease;
+}
+
+/* Когда есть изображение */
+.modal-image-container.with-image {
+    height: 250px;
+    min-height: 250px;
+}
+
+/* Когда нет изображения - уменьшенная высота */
+.modal-image-container.no-image-container {
+    height: 150px;
+    min-height: 150px;
 }
 
 .modal-image-container img {
@@ -541,14 +559,36 @@ body {
     height: 100%;
     object-fit: contain;
     background: white;
+    display: block;
 }
 
 .modal-image-container .no-image {
-    height: 250px;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #F5F7FA 0%, #E5E7EB 100%);
+    color: #9CA3AF;
+}
+
+.modal-image-container .no-image span {
+    font-size: 48px;
+    opacity: 0.4;
+}
+
+.modal-image-container .no-image p {
+    font-size: 14px;
+    margin-top: 8px;
+    opacity: 0.6;
 }
 
 .modal-info {
     padding: 20px;
+    flex: 1;
+    overflow-y: auto;
+    background: white;
 }
 
 .modal-info h2 {
@@ -559,10 +599,11 @@ body {
     color: var(--tg-theme-text-color) !important;
     display: block !important;
     visibility: visible !important;
+    opacity: 1 !important;
 }
 
 .modal-details {
-    margin-bottom: 20px;
+    margin-bottom: 0;
 }
 
 .detail-item {
@@ -608,32 +649,59 @@ body {
     font-size: 28px;
     font-weight: 700;
     color: var(--primary-color);
-    margin-bottom: 20px;
+    margin: 20px 0;
     text-align: center;
     padding: 15px;
-    background: #F5F7FA;
+    background: linear-gradient(135deg, #F5F7FA 0%, #EDF2F7 100%);
     border-radius: 12px;
+    border: 1px solid #E2E8F0;
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
 }
 
+/* Улучшенное описание товара */
 .modal-description {
+    margin-top: 15px;
     margin-bottom: 20px;
-    padding: 15px;
-    background: #F5F7FA;
-    border-radius: 8px;
+    padding: 16px;
+    background: linear-gradient(135deg, #F7FAFC 0%, #EDF2F7 100%);
+    border-radius: 10px;
+    border: 1px solid #E2E8F0;
     font-size: 14px;
     line-height: 1.6;
+    animation: fadeIn 0.3s ease;
 }
 
 .modal-description h4 {
-    margin-bottom: 8px;
-    font-size: 15px;
+    margin: 0 0 10px 0;
+    font-size: 16px;
     font-weight: 600;
+    color: #2C3E50;
+}
+
+.modal-description p {
+    margin: 0;
+    color: #4A5568;
+    font-size: 14px;
+    line-height: 1.6;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+/* Скрываем пустое описание */
+.modal-description:empty {
+    display: none !important;
+    margin: 0;
+    padding: 0;
 }
 
 .modal-actions {
     display: flex;
     gap: 10px;
     margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px solid #E5E7EB;
 }
 
 /* ====================== */
@@ -781,10 +849,52 @@ body {
     .modal-content {
         width: 95%;
         max-height: 95vh;
+        margin: 10px;
     }
     
-    .modal-image-container {
+    .modal-image-container.with-image {
         height: 200px;
+        min-height: 200px;
+    }
+    
+    .modal-image-container.no-image-container {
+        height: 120px;
+        min-height: 120px;
+    }
+    
+    .modal-image-container .no-image span {
+        font-size: 36px;
+    }
+    
+    .modal-image-container .no-image p {
+        font-size: 12px;
+    }
+    
+    .modal-info {
+        padding: 15px;
+    }
+    
+    .modal-info h2 {
+        font-size: 18px;
+    }
+    
+    .modal-description {
+        padding: 12px;
+        margin-top: 12px;
+        margin-bottom: 15px;
+    }
+    
+    .modal-description h4 {
+        font-size: 15px;
+    }
+    
+    .modal-description p {
+        font-size: 13px;
+    }
+    
+    .modal-price {
+        font-size: 24px;
+        padding: 12px;
     }
 }
 
@@ -807,5 +917,23 @@ body {
     
     .product-price {
         font-size: 16px;
+    }
+    
+    .modal-image-container.with-image {
+        height: 180px;
+        min-height: 180px;
+    }
+    
+    .modal-image-container.no-image-container {
+        height: 100px;
+        min-height: 100px;
+    }
+    
+    .modal-info h2 {
+        font-size: 16px;
+    }
+    
+    .modal-price {
+        font-size: 22px;
     }
 }

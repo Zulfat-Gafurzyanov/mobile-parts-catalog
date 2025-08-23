@@ -2,8 +2,8 @@
 // Версия и отладка
 // ======================
 
-console.log('App.js версия 4.0 загружен:', new Date().toISOString());
-console.log('Исправления: наложение текста, светлый фон, светлые бренды');
+console.log('App.js версия 5.0 загружен:', new Date().toISOString());
+console.log('Исправления: отображение описания в модальном окне, фикс наложения текста');
 
 // ====================== 
 // Глобальные переменные
@@ -299,7 +299,7 @@ function displayProducts() {
 }
 
 // ====================== 
-// Создание карточки товара - ИСПРАВЛЕНО НАЛОЖЕНИЕ
+// Создание карточки товара
 // ======================
 
 function createProductCard(product) {
@@ -312,7 +312,7 @@ function createProductCard(product) {
     
     // Создаем структуру с фиксированными размерами для изображения
     const imageHTML = hasImage ? 
-        `<div class="product-image-wrapper" style="flex: 0 0 160px; height: 160px; min-height: 160px; max-height: 160px;">
+        `<div class="product-image-wrapper">
             <img class="product-image" src="${product['Фото']}" alt="${product['Наименование']}" 
                  onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
             <div class="no-image" style="display:none;">
@@ -320,7 +320,7 @@ function createProductCard(product) {
                 <p>Нет фото</p>
             </div>
          </div>` :
-        `<div class="product-image-wrapper" style="flex: 0 0 160px; height: 160px; min-height: 160px; max-height: 160px;">
+        `<div class="product-image-wrapper">
             <div class="no-image">
                 <span>📷</span>
                 <p>Нет фото</p>
@@ -329,14 +329,14 @@ function createProductCard(product) {
     
     card.innerHTML = `
         ${imageHTML}
-        <div class="product-info" style="background: white; position: relative; z-index: 10;">
-            <div class="product-brand" style="display: block !important; margin-top: 0;">${product['Бренд']}</div>
-            <div class="product-name" style="display: block !important; visibility: visible !important; margin-top: 0;">${product['Наименование']}</div>
+        <div class="product-info">
+            <div class="product-brand">${product['Бренд']}</div>
+            <div class="product-name">${product['Наименование']}</div>
             <div class="product-stock ${inStock ? 'in-stock' : 'out-of-stock'}">
                 ${stockText}
             </div>
             <div class="product-footer">
-                <div class="product-price" style="display: block !important; visibility: visible !important;">${product.formattedPrice} ₽</div>
+                <div class="product-price">${product.formattedPrice} ₽</div>
             </div>
         </div>
     `;
@@ -347,64 +347,86 @@ function createProductCard(product) {
 }
 
 // ====================== 
-// Показ деталей товара
+// Показ деталей товара - ИСПРАВЛЕНО
 // ======================
 
 function showProductDetails(product) {
     console.log('Открываем модальное окно для:', product['Наименование']);
+    console.log('Описание товара:', product['Описание']);
     
     const modal = document.getElementById('productModal');
     const hasImage = product['Фото'] && product['Фото'] !== 'None';
     const inStock = product['Остаток'] > 0;
     
+    // Заголовок и бренд
     const modalTitle = document.getElementById('modalTitle');
     const modalBrand = document.getElementById('modalBrand');
     const modalPrice = document.getElementById('modalPrice');
     
     modalTitle.textContent = product['Наименование'];
-    modalTitle.style.display = 'block';
-    modalTitle.style.visibility = 'visible';
-    
     modalBrand.textContent = product['Бренд'];
-    modalBrand.style.display = 'inline-block';
-    modalBrand.style.visibility = 'visible';
-    
     modalPrice.innerHTML = `${product.formattedPrice} ₽`;
-    modalPrice.style.display = 'block';
-    modalPrice.style.visibility = 'visible';
     
+    // Наличие
     const stockElement = document.getElementById('modalStock');
     stockElement.textContent = inStock ? `В наличии: ${product['Остаток']} шт` : 'Нет в наличии';
     stockElement.className = `stock-badge ${inStock ? 'in-stock' : 'out-of-stock'}`;
     
+    // Изображение или заглушка
     const modalImageWrapper = document.getElementById('modalImageWrapper');
     
     if (hasImage) {
         modalImageWrapper.innerHTML = `
-            <img id="modalImage" src="${product['Фото']}" alt="${product['Наименование']}" 
+            <img src="${product['Фото']}" alt="${product['Наименование']}" 
                  onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
-            <div class="no-image" id="modalNoImage" style="display:none;">
+            <div class="no-image" style="display:none;">
                 <span>📷</span>
                 <p>Нет фото</p>
             </div>
         `;
+        modalImageWrapper.className = 'modal-image-container with-image';
     } else {
         modalImageWrapper.innerHTML = `
-            <div class="no-image" id="modalNoImage">
+            <div class="no-image">
                 <span>📷</span>
                 <p>Нет фото</p>
             </div>
         `;
+        modalImageWrapper.className = 'modal-image-container no-image-container';
     }
     
+    // Описание товара - УЛУЧШЕННАЯ ОБРАБОТКА
     const descriptionElement = document.getElementById('modalDescription');
-    if (product['Описание'] && product['Описание'] !== 'None') {
-        descriptionElement.innerHTML = `<h4>Описание:</h4><p>${product['Описание']}</p>`;
+    
+    // Проверяем наличие описания более тщательно
+    const hasDescription = product['Описание'] && 
+                          product['Описание'] !== 'None' && 
+                          product['Описание'].trim() !== '';
+    
+    if (hasDescription) {
+        // Очищаем контейнер описания
+        descriptionElement.innerHTML = '';
         descriptionElement.style.display = 'block';
+        
+        // Создаем заголовок
+        const descTitle = document.createElement('h4');
+        descTitle.textContent = 'Описание товара:';
+        descTitle.style.marginBottom = '10px';
+        
+        // Создаем параграф с описанием
+        const descText = document.createElement('p');
+        descText.textContent = product['Описание'];
+        
+        // Добавляем элементы в контейнер
+        descriptionElement.appendChild(descTitle);
+        descriptionElement.appendChild(descText);
     } else {
+        // Скрываем блок описания если его нет
+        descriptionElement.innerHTML = '';
         descriptionElement.style.display = 'none';
     }
     
+    // Показываем модальное окно
     modal.classList.add('active');
     document.body.style.overflow = 'hidden';
     
