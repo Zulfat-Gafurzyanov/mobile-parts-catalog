@@ -1,4 +1,11 @@
 // ====================== 
+// Версия и отладка
+// ======================
+
+console.log('App.js версия 4.0 загружен:', new Date().toISOString());
+console.log('Исправления: наложение текста, светлый фон, светлые бренды');
+
+// ====================== 
 // Глобальные переменные
 // ======================
 
@@ -7,7 +14,7 @@ let filteredProducts = [];
 let currentCategory = null;
 let currentBrand = null;
 let currentPage = 1;
-const itemsPerPage = 8; // Изменено на 8 товаров
+const itemsPerPage = 8;
 let searchTimeout = null;
 
 // ====================== 
@@ -18,22 +25,31 @@ const tg = window.Telegram ? window.Telegram.WebApp : null;
 
 // Настройка темы Telegram
 function setupTelegramTheme() {
-    if (!tg) return;
+    if (!tg) {
+        console.log('Telegram WebApp не обнаружен, работаем в браузере');
+        // Устанавливаем светлую тему по умолчанию
+        document.documentElement.style.setProperty('--tg-theme-bg-color', '#FFFFFF');
+        document.documentElement.style.setProperty('--tg-theme-text-color', '#2C3E50');
+        document.documentElement.style.setProperty('--tg-theme-hint-color', '#6C757D');
+        document.documentElement.style.setProperty('--tg-theme-secondary-bg-color', '#F5F7FA');
+        return;
+    }
     
+    console.log('Telegram WebApp инициализирован');
     tg.ready();
     tg.expand();
     
-    // Применяем цвета темы Telegram с мягкой палитрой
-    const theme = tg.themeParams;
-    if (theme) {
-        document.documentElement.style.setProperty('--tg-theme-bg-color', theme.bg_color || '#F8F9FA');
-        document.documentElement.style.setProperty('--tg-theme-text-color', theme.text_color || '#2C3E50');
-        document.documentElement.style.setProperty('--tg-theme-hint-color', theme.hint_color || '#6C757D');
-        document.documentElement.style.setProperty('--tg-theme-link-color', theme.link_color || '#5E72E4');
-        document.documentElement.style.setProperty('--tg-theme-button-color', theme.button_color || '#5E72E4');
-        document.documentElement.style.setProperty('--tg-theme-button-text-color', theme.button_text_color || '#ffffff');
-        document.documentElement.style.setProperty('--tg-theme-secondary-bg-color', theme.secondary_bg_color || '#F0F2F5');
-    }
+    // Применяем светлую тему независимо от настроек Telegram
+    document.documentElement.style.setProperty('--tg-theme-bg-color', '#FFFFFF');
+    document.documentElement.style.setProperty('--tg-theme-text-color', '#2C3E50');
+    document.documentElement.style.setProperty('--tg-theme-hint-color', '#6C757D');
+    document.documentElement.style.setProperty('--tg-theme-link-color', '#5E72E4');
+    document.documentElement.style.setProperty('--tg-theme-button-color', '#5E72E4');
+    document.documentElement.style.setProperty('--tg-theme-button-text-color', '#ffffff');
+    document.documentElement.style.setProperty('--tg-theme-secondary-bg-color', '#F5F7FA');
+    
+    // Устанавливаем светлый фон для body
+    document.body.style.backgroundColor = '#FFFFFF';
 }
 
 // ====================== 
@@ -41,7 +57,6 @@ function setupTelegramTheme() {
 // ======================
 
 function formatPrice(price) {
-    // Преобразуем в число и форматируем с 2 знаками после запятой
     const numPrice = parseFloat(price) || 0;
     return numPrice.toFixed(2).replace('.', ',');
 }
@@ -54,25 +69,21 @@ async function loadCatalog() {
     showLoader(true);
     
     try {
-        // В продакшене замените на реальный URL вашего API
+        console.log('Начинаем загрузку каталога...');
+        
         const response = await fetch('catalog.json');
         
         if (!response.ok) {
-            throw new Error('Ошибка загрузки каталога');
+            throw new Error('Ошибка загрузки каталога: ' + response.status);
         }
         
         catalogData = await response.json();
+        console.log('Каталог загружен, товаров:', catalogData.items ? catalogData.items.length : 0);
         
-        // Обрабатываем данные
         processCatalogData();
-        
-        // Инициализируем интерфейс
         initializeUI();
         
-        // Инициализируем отфильтрованный список всеми товарами
         filteredProducts = [...catalogData.items];
-        
-        // Показываем первую страницу товаров
         displayProducts();
         
     } catch (error) {
@@ -88,19 +99,14 @@ async function loadCatalog() {
 // ======================
 
 function processCatalogData() {
-    // Добавляем вычисляемые поля
     catalogData.items = catalogData.items.map(item => {
-        // Извлекаем модель телефона из названия
         const modelMatch = item['Наименование'].match(/для\s+([^с]+?)(?:\s+с\s+|\s+модуль|\s+плата|$)/i);
         const phoneModel = modelMatch ? modelMatch[1].trim() : '';
         
-        // Используем цену из данных
         const price = parseFloat(item['Цена']) || 0;
         
-        // Исправляем бренд, если он None или пустой
         let brand = item['Бренд'];
         if (!brand || brand === 'None') {
-            // Пытаемся извлечь бренд из названия
             const brandMatch = item['Наименование'].match(/^(iPhone|iPad|Samsung|Xiaomi|Huawei|OnePlus|Apple|Google|Sony|LG|Nokia|Motorola|Realme|Oppo|Vivo)/i);
             brand = brandMatch ? brandMatch[1] : 'Не указан';
         }
@@ -115,7 +121,6 @@ function processCatalogData() {
         };
     });
     
-    // Обновляем статистику
     updateStats();
 }
 
@@ -124,11 +129,18 @@ function processCatalogData() {
 // ======================
 
 function initializeUI() {
-    // Создаем фильтры по брендам
     createBrandFilters();
-    
-    // Настраиваем обработчики событий
     setupEventListeners();
+    
+    // Принудительно устанавливаем светлый фон
+    document.body.style.backgroundColor = '#FFFFFF';
+    
+    const checkboxText = document.querySelector('.checkbox-text');
+    if (checkboxText) {
+        checkboxText.style.display = 'inline-block';
+        checkboxText.style.visibility = 'visible';
+        console.log('Текст чекбокса принудительно сделан видимым');
+    }
 }
 
 // ====================== 
@@ -138,7 +150,6 @@ function initializeUI() {
 function createBrandFilters() {
     const brandsContainer = document.getElementById('brandsContainer');
     
-    // Собираем уникальные бренды
     const brandsMap = new Map();
     
     catalogData.items.forEach(item => {
@@ -151,10 +162,8 @@ function createBrandFilters() {
         }
     });
     
-    // Создаем чипы брендов
     brandsContainer.innerHTML = '';
     
-    // Сортируем бренды по количеству товаров
     const sortedBrands = Array.from(brandsMap.entries()).sort((a, b) => b[1] - a[1]);
     
     sortedBrands.forEach(([brand, count]) => {
@@ -174,7 +183,6 @@ function createBrandFilters() {
 // ======================
 
 function setupEventListeners() {
-    // Поиск
     const searchInput = document.getElementById('searchInput');
     searchInput.addEventListener('input', (e) => {
         clearTimeout(searchTimeout);
@@ -183,16 +191,16 @@ function setupEventListeners() {
         }, 300);
     });
     
-    // Фильтр по наличию
-    document.getElementById('inStockOnly').addEventListener('change', filterProducts);
+    const inStockCheckbox = document.getElementById('inStockOnly');
+    inStockCheckbox.addEventListener('change', filterProducts);
     
-    // Сброс фильтров
+    inStockCheckbox.addEventListener('click', function() {
+        console.log('Чекбокс нажат, состояние:', this.checked);
+    });
+    
     document.getElementById('clearFilter').addEventListener('click', clearFilters);
-    
-    // Кнопка "Показать еще"
     document.getElementById('loadMoreBtn').addEventListener('click', loadMore);
     
-    // Закрытие модального окна
     document.getElementById('modalClose').addEventListener('click', closeModal);
     document.getElementById('modalCloseBtn').addEventListener('click', closeModal);
     document.getElementById('productModal').addEventListener('click', (e) => {
@@ -207,12 +215,10 @@ function setupEventListeners() {
 // ======================
 
 function selectBrand(brand, chipElement) {
-    // Убираем активный класс со всех чипов
     document.querySelectorAll('.brand-chip').forEach(chip => {
         chip.classList.remove('active');
     });
     
-    // Если выбран тот же бренд, сбрасываем фильтр
     if (currentBrand === brand) {
         currentBrand = null;
     } else {
@@ -231,23 +237,19 @@ function filterProducts() {
     const searchQuery = document.getElementById('searchInput').value.toLowerCase();
     const inStockOnly = document.getElementById('inStockOnly').checked;
     
+    console.log('Фильтрация: поиск =', searchQuery, ', только в наличии =', inStockOnly, ', бренд =', currentBrand);
+    
     filteredProducts = catalogData.items.filter(item => {
-        // Фильтр по поиску
         const matchesSearch = !searchQuery || item.searchText.includes(searchQuery);
-        
-        // Фильтр по бренду
         const matchesBrand = !currentBrand || item['Бренд'] === currentBrand;
-        
-        // Фильтр по наличию
         const matchesStock = !inStockOnly || item['Остаток'] > 0;
         
         return matchesSearch && matchesBrand && matchesStock;
     });
     
-    // Сбрасываем страницу
-    currentPage = 1;
+    console.log('После фильтрации найдено товаров:', filteredProducts.length);
     
-    // Обновляем отображение
+    currentPage = 1;
     displayProducts();
 }
 
@@ -260,7 +262,6 @@ function displayProducts() {
     const emptyState = document.getElementById('emptyState');
     const loadMoreContainer = document.getElementById('loadMoreContainer');
     
-    // Если нет товаров
     if (filteredProducts.length === 0) {
         grid.innerHTML = '';
         emptyState.classList.add('visible');
@@ -271,17 +272,14 @@ function displayProducts() {
     
     emptyState.classList.remove('visible');
     
-    // Вычисляем товары для отображения
     const startIndex = 0;
     const endIndex = currentPage * itemsPerPage;
     const productsToShow = filteredProducts.slice(startIndex, endIndex);
     
-    // Очищаем сетку при первой странице
     if (currentPage === 1) {
         grid.innerHTML = '';
     }
     
-    // Добавляем карточки товаров
     productsToShow.forEach((product, index) => {
         if (index >= (currentPage - 1) * itemsPerPage) {
             const card = createProductCard(product);
@@ -289,10 +287,8 @@ function displayProducts() {
         }
     });
     
-    // Обновляем счетчик результатов
     updateResultsCount(productsToShow.length);
     
-    // Показываем/скрываем кнопку "Показать еще"
     if (endIndex < filteredProducts.length) {
         loadMoreContainer.classList.add('visible');
         const remainingItems = filteredProducts.length - endIndex;
@@ -303,7 +299,7 @@ function displayProducts() {
 }
 
 // ====================== 
-// Создание карточки товара
+// Создание карточки товара - ИСПРАВЛЕНО НАЛОЖЕНИЕ
 // ======================
 
 function createProductCard(product) {
@@ -314,30 +310,33 @@ function createProductCard(product) {
     const inStock = product['Остаток'] > 0;
     const stockText = inStock ? `В наличии: ${product['Остаток']} шт` : 'Нет в наличии';
     
+    // Создаем структуру с фиксированными размерами для изображения
+    const imageHTML = hasImage ? 
+        `<div class="product-image-wrapper" style="flex: 0 0 160px; height: 160px; min-height: 160px; max-height: 160px;">
+            <img class="product-image" src="${product['Фото']}" alt="${product['Наименование']}" 
+                 onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+            <div class="no-image" style="display:none;">
+                <span>📷</span>
+                <p>Нет фото</p>
+            </div>
+         </div>` :
+        `<div class="product-image-wrapper" style="flex: 0 0 160px; height: 160px; min-height: 160px; max-height: 160px;">
+            <div class="no-image">
+                <span>📷</span>
+                <p>Нет фото</p>
+            </div>
+        </div>`;
+    
     card.innerHTML = `
-        ${hasImage ? 
-            `<div class="product-image-wrapper">
-                <img class="product-image" src="${product['Фото']}" alt="${product['Наименование']}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
-                <div class="no-image" style="display:none;">
-                    <span>📷</span>
-                    <p>Нет фото</p>
-                </div>
-             </div>` :
-            `<div class="product-image-wrapper">
-                <div class="no-image">
-                    <span>📷</span>
-                    <p>Нет фото</p>
-                </div>
-            </div>`
-        }
-        <div class="product-info">
-            <div class="product-brand">${product['Бренд']}</div>
-            <div class="product-name">${product['Наименование']}</div>
+        ${imageHTML}
+        <div class="product-info" style="background: white; position: relative; z-index: 10;">
+            <div class="product-brand" style="display: block !important; margin-top: 0;">${product['Бренд']}</div>
+            <div class="product-name" style="display: block !important; visibility: visible !important; margin-top: 0;">${product['Наименование']}</div>
             <div class="product-stock ${inStock ? 'in-stock' : 'out-of-stock'}">
                 ${stockText}
             </div>
             <div class="product-footer">
-                <div class="product-price">${product.formattedPrice} ₽</div>
+                <div class="product-price" style="display: block !important; visibility: visible !important;">${product.formattedPrice} ₽</div>
             </div>
         </div>
     `;
@@ -352,25 +351,38 @@ function createProductCard(product) {
 // ======================
 
 function showProductDetails(product) {
+    console.log('Открываем модальное окно для:', product['Наименование']);
+    
     const modal = document.getElementById('productModal');
     const hasImage = product['Фото'] && product['Фото'] !== 'None';
     const inStock = product['Остаток'] > 0;
     
-    // Заполняем модальное окно
-    document.getElementById('modalTitle').textContent = product['Наименование'];
-    document.getElementById('modalBrand').textContent = product['Бренд'];
+    const modalTitle = document.getElementById('modalTitle');
+    const modalBrand = document.getElementById('modalBrand');
+    const modalPrice = document.getElementById('modalPrice');
     
-    // Наличие
+    modalTitle.textContent = product['Наименование'];
+    modalTitle.style.display = 'block';
+    modalTitle.style.visibility = 'visible';
+    
+    modalBrand.textContent = product['Бренд'];
+    modalBrand.style.display = 'inline-block';
+    modalBrand.style.visibility = 'visible';
+    
+    modalPrice.innerHTML = `${product.formattedPrice} ₽`;
+    modalPrice.style.display = 'block';
+    modalPrice.style.visibility = 'visible';
+    
     const stockElement = document.getElementById('modalStock');
     stockElement.textContent = inStock ? `В наличии: ${product['Остаток']} шт` : 'Нет в наличии';
     stockElement.className = `stock-badge ${inStock ? 'in-stock' : 'out-of-stock'}`;
     
-    // Изображение
     const modalImageWrapper = document.getElementById('modalImageWrapper');
     
     if (hasImage) {
         modalImageWrapper.innerHTML = `
-            <img id="modalImage" src="${product['Фото']}" alt="${product['Наименование']}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+            <img id="modalImage" src="${product['Фото']}" alt="${product['Наименование']}" 
+                 onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
             <div class="no-image" id="modalNoImage" style="display:none;">
                 <span>📷</span>
                 <p>Нет фото</p>
@@ -385,10 +397,6 @@ function showProductDetails(product) {
         `;
     }
     
-    // Цена с форматированием
-    document.getElementById('modalPrice').innerHTML = `${product.formattedPrice} ₽`;
-    
-    // Описание
     const descriptionElement = document.getElementById('modalDescription');
     if (product['Описание'] && product['Описание'] !== 'None') {
         descriptionElement.innerHTML = `<h4>Описание:</h4><p>${product['Описание']}</p>`;
@@ -397,11 +405,10 @@ function showProductDetails(product) {
         descriptionElement.style.display = 'none';
     }
     
-    // Показываем модальное окно
     modal.classList.add('active');
-    
-    // Блокируем скролл body
     document.body.style.overflow = 'hidden';
+    
+    console.log('Модальное окно открыто');
 }
 
 // ====================== 
@@ -428,17 +435,14 @@ function loadMore() {
 // ======================
 
 function clearFilters() {
-    // Сбрасываем все фильтры
     document.getElementById('searchInput').value = '';
     document.getElementById('inStockOnly').checked = false;
     currentBrand = null;
     
-    // Убираем активный класс со всех брендов
     document.querySelectorAll('.brand-chip').forEach(chip => {
         chip.classList.remove('active');
     });
     
-    // Перефильтровываем
     filterProducts();
 }
 
@@ -497,7 +501,9 @@ function showError(message) {
 // ======================
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Настраиваем тему Telegram
+    console.log('DOM загружен, запускаем приложение');
+    
+    // Настраиваем тему Telegram (всегда светлую)
     setupTelegramTheme();
     
     // Загружаем каталог
