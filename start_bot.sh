@@ -1,4 +1,5 @@
-cd /путь до проекта/mobile-parts-catalog
+ssh localhost -p222
+cd ~/zulfat/mobile-parts-catalog
 
 # Проверяем, не запущен ли уже бот
 if [ -f bot.pid ]; then

@@ -191,104 +191,9 @@ pip install -r requirements.txt
 # Копирование и настройка конфигурации
 cp .env.example .env
 nano .env  # Отредактируйте BOT_TOKEN и MINIAPP_URL
-
-# Настройка прав доступа
-sudo chown -R www-data:www-data /var/www/mobile-parts-catalog
-sudo chmod -R 755 /var/www/mobile-parts-catalog
 ```
 
-### 3. Настройка Nginx
-
-Создайте файл конфигурации:
-
-```bash
-sudo nano /etc/nginx/sites-available/mobile-parts-catalog
-```
-
-Содержимое:
-
-```nginx
-server {
-    listen 80;
-    server_name your-domain.com;
-    return 301 https://$server_name$request_uri;
-}
-
-server {
-    listen 443 ssl;
-    server_name your-domain.com;
-    
-    ssl_certificate /etc/letsencrypt/live/your-domain.com/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/your-domain.com/privkey.pem;
-    
-    root /var/www/mobile-parts-catalog;
-    
-    location /frontend/ {
-        try_files $uri $uri/ /frontend/index.html;
-        add_header X-Frame-Options "ALLOWALL";
-        add_header Cache-Control "no-cache, no-store, must-revalidate";
-    }
-    
-    location /frontend/catalog.json {
-        add_header Cache-Control "no-cache, no-store, must-revalidate";
-        add_header Pragma "no-cache";
-        add_header Expires "0";
-    }
-}
-```
-
-Активируйте конфигурацию:
-
-```bash
-sudo ln -s /etc/nginx/sites-available/mobile-parts-catalog /etc/nginx/sites-enabled/
-sudo nginx -t
-sudo systemctl restart nginx
-```
-
-### 4. Получение SSL сертификата
-
-```bash
-sudo certbot --nginx -d your-domain.com
-```
-
-### 5. Настройка systemd сервиса для бота
-
-Создайте файл сервиса:
-
-```bash
-sudo nano /etc/systemd/system/telegram-parts-bot.service
-```
-
-Содержимое:
-
-```ini
-[Unit]
-Description=Telegram Parts Catalog Bot
-After=network.target
-
-[Service]
-Type=simple
-User=www-data
-WorkingDirectory=/var/www/mobile-parts-catalog
-Environment="PATH=/var/www/mobile-parts-catalog/venv/bin"
-ExecStart=/var/www/mobile-parts-catalog/venv/bin/python telegram_bot/main.py
-Restart=always
-RestartSec=10
-
-[Install]
-WantedBy=multi-user.target
-```
-
-Запустите сервис:
-
-```bash
-sudo systemctl daemon-reload
-sudo systemctl enable telegram-parts-bot
-sudo systemctl start telegram-parts-bot
-sudo systemctl status telegram-parts-bot
-```
-
-### 6. Использование скриптов запуска/остановки
+### 3. Использование скриптов запуска/остановки
 
 Скопируйте и настройте скрипты:
 
@@ -313,7 +218,7 @@ nano start_bot.sh
 ./stop_bot.sh
 ```
 
-### 7. Настройка автоматической конвертации
+### 4. Настройка автоматической конвертации
 
 ```bash
 # Откройте crontab для пользователя www-data
@@ -335,9 +240,6 @@ sudo crontab -u www-data -e
 ### Просмотр логов бота
 
 ```bash
-# Логи systemd сервиса
-sudo journalctl -u telegram-parts-bot -f
-
 # Логи из файла
 tail -f logs/bot.log
 ```
@@ -352,13 +254,7 @@ tail -f backend/logs_and_hashes/converter.log
 
 ```bash
 # Статус бота
-sudo systemctl status telegram-parts-bot
-
-# Статус Nginx
-sudo systemctl status nginx
-
-# Проверка процесса бота
-ps aux | grep python | grep main.py
+./check_status.sh
 ```
 
 ## 🐛 Решение проблем
@@ -392,9 +288,7 @@ ls -la backend/logs_and_hashes/
 
 - Проверьте SSL сертификат (обязателен для Telegram)
 - Проверьте MINIAPP_URL в .env
-- Проверьте настройки Nginx
-- Проверьте CORS заголовки
 
-## 👥 Авторы
+## 👥 Автор
 
 Zulfat-Gafurzyanov - [GitHub](https://github.com/Zulfat-Gafurzyanov)
