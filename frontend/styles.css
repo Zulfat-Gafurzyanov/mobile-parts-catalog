@@ -3,23 +3,18 @@
 /* ====================== */
 
 :root {
-    /* Гармоничная цветовая палитра */
     --primary-color: #5E72E4;
     --primary-light: #8896F0;
     --primary-dark: #4C63D2;
     --secondary-color: #6C757D;
     --secondary-light: #ADB5BD;
-    
-    /* Светлые цвета для приложения */
-    --tg-theme-bg-color: #FFFFFF;
-    --tg-theme-text-color: #2C3E50;
+    --tg-theme-bg-color: #FFFFFF !important;
+    --tg-theme-text-color: #2C3E50 !important;
     --tg-theme-hint-color: #6C757D;
     --tg-theme-link-color: #5E72E4;
     --tg-theme-button-color: #5E72E4;
     --tg-theme-button-text-color: #ffffff;
     --tg-theme-secondary-bg-color: #F5F7FA;
-    
-    /* Дополнительные цвета */
     --primary-gradient: linear-gradient(135deg, #5E72E4 0%, #7B8FF5 100%);
     --success-color: #2DCE89;
     --warning-color: #FB6340;
@@ -37,12 +32,18 @@
 }
 
 body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif !important;
+    background-color: #FFFFFF !important;
     background: #FFFFFF !important;
-    color: var(--tg-theme-text-color);
+    color: #2C3E50 !important;
     min-height: 100vh;
     overflow-x: hidden;
     line-height: 1.5;
+}
+
+/* Принудительный белый фон для всех контейнеров */
+body > * {
+    background-color: inherit !important;
 }
 
 /* ====================== */
@@ -50,8 +51,8 @@ body {
 /* ====================== */
 
 .header {
-    background: var(--primary-gradient);
-    color: white;
+    background: var(--primary-gradient) !important;
+    color: white !important;
     padding: 20px;
     position: sticky;
     top: 0;
@@ -63,6 +64,7 @@ body {
     font-size: 24px;
     font-weight: 600;
     margin-bottom: 10px;
+    color: white !important;
 }
 
 .stats {
@@ -93,7 +95,7 @@ body {
 
 .search-container {
     padding: 15px;
-    background: white;
+    background: #FFFFFF !important;
     position: sticky;
     top: 88px;
     z-index: 99;
@@ -106,7 +108,7 @@ body {
     border: 1px solid var(--border-color);
     border-radius: 12px;
     font-size: 16px;
-    background: #F5F7FA;
+    background: #F5F7FA !important;
     color: #2C3E50 !important;
     transition: all 0.3s ease;
 }
@@ -119,18 +121,18 @@ body {
 .search-input:focus {
     outline: none;
     border-color: var(--primary-color);
-    background: white;
+    background: white !important;
     box-shadow: 0 0 0 3px rgba(94, 114, 228, 0.1);
     color: #2C3E50 !important;
 }
 
 /* ====================== */
-/* Бренды - Светлый дизайн */
+/* Бренды */
 /* ====================== */
 
 .brands-container {
     padding: 15px;
-    background: white;
+    background: #FFFFFF !important;
     border-bottom: 1px solid var(--border-color);
 }
 
@@ -144,7 +146,7 @@ body {
 .brands-header h3 {
     font-size: 16px;
     font-weight: 600;
-    color: var(--tg-theme-text-color);
+    color: #2C3E50 !important;
 }
 
 .clear-filter {
@@ -207,69 +209,76 @@ body {
 }
 
 /* ====================== */
-/* Фильтр по наличию */
+/* Фильтр по наличию - УСИЛЕННЫЙ */
 /* ====================== */
 
 .availability-filter {
     padding: 15px;
-    background: white;
+    background: #FFFFFF !important;
     border-bottom: 1px solid var(--border-color);
 }
 
-.checkbox-container {
+/* Используем новые классы с префиксом tg- */
+.tg-checkbox-container {
     display: inline-flex !important;
-    align-items: center;
-    cursor: pointer;
-    user-select: none;
-    font-size: 15px;
-    position: relative;
+    align-items: center !important;
+    cursor: pointer !important;
+    user-select: none !important;
+    font-size: 15px !important;
+    position: relative !important;
+    min-height: 24px !important;
 }
 
-.checkbox-container input {
-    position: absolute;
-    opacity: 0;
-    cursor: pointer;
-    height: 20px;
-    width: 20px;
-    z-index: 1;
+.tg-checkbox-container input {
+    position: absolute !important;
+    opacity: 0 !important;
+    cursor: pointer !important;
+    height: 20px !important;
+    width: 20px !important;
+    z-index: 2 !important;
+    left: 0 !important;
+    top: 2px !important;
 }
 
-.checkmark {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 20px;
-    height: 20px;
-    border: 2px solid var(--border-color);
-    border-radius: 4px;
-    background: white;
-    transition: all 0.2s;
+.tg-checkmark {
+    position: absolute !important;
+    left: 0 !important;
+    top: 2px !important;
+    width: 20px !important;
+    height: 20px !important;
+    border: 2px solid #DEE2E6 !important;
+    border-radius: 4px !important;
+    background: white !important;
+    transition: all 0.2s !important;
+    pointer-events: none !important;
 }
 
-.checkbox-container input:checked ~ .checkmark {
-    background: var(--primary-color);
-    border-color: var(--primary-color);
+.tg-checkbox-container input:checked ~ .tg-checkmark {
+    background: #5E72E4 !important;
+    border-color: #5E72E4 !important;
 }
 
-.checkbox-container input:checked ~ .checkmark:after {
-    content: '';
-    position: absolute;
-    display: block;
-    left: 6px;
-    top: 2px;
-    width: 5px;
-    height: 10px;
-    border: solid white;
-    border-width: 0 2px 2px 0;
-    transform: rotate(45deg);
+.tg-checkbox-container input:checked ~ .tg-checkmark:after {
+    content: '' !important;
+    position: absolute !important;
+    display: block !important;
+    left: 6px !important;
+    top: 2px !important;
+    width: 5px !important;
+    height: 10px !important;
+    border: solid white !important;
+    border-width: 0 2px 2px 0 !important;
+    transform: rotate(45deg) !important;
 }
 
-.checkbox-text {
-    margin-left: 30px;
-    color: var(--tg-theme-text-color);
+.tg-checkbox-text {
+    margin-left: 28px !important;
+    color: #2C3E50 !important;
     display: inline-block !important;
     visibility: visible !important;
     opacity: 1 !important;
+    font-size: 15px !important;
+    line-height: 20px !important;
 }
 
 /* ====================== */
@@ -278,7 +287,7 @@ body {
 
 .results-counter {
     padding: 10px 15px;
-    background: #F5F7FA;
+    background: #F5F7FA !important;
     font-size: 14px;
     color: var(--tg-theme-hint-color);
     border-bottom: 1px solid var(--border-color);
@@ -294,7 +303,7 @@ body {
     gap: 20px;
     padding: 20px;
     min-height: 200px;
-    background: #FAFBFC;
+    background: #FAFBFC !important;
 }
 
 @media (min-width: 768px) {
@@ -313,22 +322,22 @@ body {
 }
 
 /* ====================== */
-/* Карточка товара */
+/* Карточка товара - УСИЛЕННАЯ */
 /* ====================== */
 
-.product-card {
-    background: white;
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: var(--shadow-sm);
-    cursor: pointer;
-    transition: all 0.3s ease;
-    animation: fadeIn 0.4s ease;
-    border: 1px solid var(--border-color);
-    display: flex;
-    flex-direction: column;
-    position: relative;
-    height: 100%;
+.tg-product-card {
+    background: white !important;
+    border-radius: 12px !important;
+    overflow: hidden !important;
+    box-shadow: var(--shadow-sm) !important;
+    cursor: pointer !important;
+    transition: all 0.3s ease !important;
+    animation: fadeIn 0.4s ease !important;
+    border: 1px solid var(--border-color) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    position: relative !important;
+    height: 100% !important;
 }
 
 @keyframes fadeIn {
@@ -342,123 +351,123 @@ body {
     }
 }
 
-.product-card:hover {
+.tg-product-card:hover {
     transform: translateY(-4px);
-    box-shadow: var(--shadow-lg);
-    border-color: var(--primary-light);
+    box-shadow: var(--shadow-lg) !important;
+    border-color: var(--primary-light) !important;
 }
 
-.product-image-wrapper {
-    width: 100%;
-    height: 160px;
-    min-height: 160px;
-    max-height: 160px;
-    position: relative;
-    overflow: hidden;
-    background: #F5F7FA;
-    flex: 0 0 160px;
-}
-
-.product-image {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    background: white;
-    display: block;
-}
-
-.no-image {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    background: linear-gradient(135deg, #F5F7FA 0%, #E5E7EB 100%);
-    color: #9CA3AF;
-}
-
-.no-image span {
-    font-size: 40px;
-    opacity: 0.5;
-}
-
-.no-image p {
-    font-size: 12px;
-    margin-top: 5px;
-    opacity: 0.7;
-}
-
-.product-info {
-    padding: 12px;
-    display: flex;
-    flex-direction: column;
-    flex: 1;
-    background: white;
-    position: relative;
-    z-index: 10;
-    margin-top: 0;
-}
-
-.product-brand {
-    font-size: 11px;
-    color: var(--tg-theme-hint-color);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-bottom: 4px;
-    margin-top: 0;
+.tg-product-image-wrapper {
+    width: 100% !important;
+    height: 160px !important;
+    min-height: 160px !important;
+    max-height: 160px !important;
+    position: relative !important;
+    overflow: hidden !important;
+    background: #F5F7FA !important;
+    flex: 0 0 160px !important;
     display: block !important;
 }
 
-.product-name {
-    font-size: 14px;
-    font-weight: 500;
-    color: var(--tg-theme-text-color) !important;
-    margin-bottom: 8px;
-    margin-top: 0;
-    line-height: 1.4;
-    display: -webkit-box !important;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    min-height: 38px;
+.tg-product-image {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: contain !important;
+    background: white !important;
+    display: block !important;
+}
+
+.tg-no-image {
+    width: 100% !important;
+    height: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background: linear-gradient(135deg, #F5F7FA 0%, #E5E7EB 100%) !important;
+    color: #9CA3AF !important;
+}
+
+.tg-no-image span {
+    font-size: 40px !important;
+    opacity: 0.5 !important;
+}
+
+.tg-no-image p {
+    font-size: 12px !important;
+    margin-top: 5px !important;
+    opacity: 0.7 !important;
+}
+
+.tg-product-info {
+    padding: 12px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    flex: 1 !important;
+    background: white !important;
+    position: relative !important;
+    z-index: 10 !important;
+    margin-top: 0 !important;
+}
+
+.tg-product-brand {
+    font-size: 11px !important;
+    color: #6C757D !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+    margin-bottom: 4px !important;
+    margin-top: 0 !important;
+    display: block !important;
     visibility: visible !important;
-    word-wrap: break-word;
-    overflow-wrap: break-word;
     opacity: 1 !important;
 }
 
-.product-stock {
-    font-size: 12px;
-    margin-bottom: 8px;
-    font-weight: 500;
+.tg-product-name {
+    font-size: 14px !important;
+    font-weight: 500 !important;
+    color: #2C3E50 !important;
+    margin-bottom: 8px !important;
+    margin-top: 0 !important;
+    line-height: 1.4 !important;
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    min-height: 38px !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
 }
 
-.product-stock.in-stock {
-    color: var(--success-color);
+.tg-product-stock {
+    font-size: 12px !important;
+    margin-bottom: 8px !important;
+    font-weight: 500 !important;
 }
 
-.product-stock.out-of-stock {
-    color: var(--danger-color);
+.tg-product-stock.in-stock {
+    color: #2DCE89 !important;
 }
 
-.product-footer {
-    padding-top: 8px;
-    border-top: 1px solid var(--border-color);
-    margin-top: auto;
+.tg-product-stock.out-of-stock {
+    color: #F5365C !important;
 }
 
-.product-price {
-    font-size: 18px;
-    font-weight: 600;
-    color: var(--tg-theme-text-color) !important;
+.tg-product-footer {
+    padding-top: 8px !important;
+    border-top: 1px solid var(--border-color) !important;
+    margin-top: auto !important;
+}
+
+.tg-product-price {
+    font-size: 18px !important;
+    font-weight: 600 !important;
+    color: #2C3E50 !important;
     display: block !important;
     visibility: visible !important;
     opacity: 1 !important;
 }
 
 /* ====================== */
-/* Модальное окно */
+/* Модальное окно - УСИЛЕННОЕ */
 /* ====================== */
 
 .modal {
@@ -480,7 +489,7 @@ body {
 }
 
 .modal-content {
-    background: white;
+    background: white !important;
     width: 90%;
     max-width: 500px;
     max-height: 90vh;
@@ -542,13 +551,11 @@ body {
     transition: height 0.3s ease;
 }
 
-/* Когда есть изображение */
 .modal-image-container.with-image {
     height: 250px;
     min-height: 250px;
 }
 
-/* Когда нет изображения - уменьшенная высота */
 .modal-image-container.no-image-container {
     height: 150px;
     min-height: 150px;
@@ -573,30 +580,19 @@ body {
     color: #9CA3AF;
 }
 
-.modal-image-container .no-image span {
-    font-size: 48px;
-    opacity: 0.4;
-}
-
-.modal-image-container .no-image p {
-    font-size: 14px;
-    margin-top: 8px;
-    opacity: 0.6;
-}
-
 .modal-info {
     padding: 20px;
     flex: 1;
     overflow-y: auto;
-    background: white;
+    background: white !important;
 }
 
-.modal-info h2 {
-    font-size: 20px;
-    font-weight: 600;
-    margin-bottom: 16px;
-    line-height: 1.3;
-    color: var(--tg-theme-text-color) !important;
+.tg-modal-title {
+    font-size: 20px !important;
+    font-weight: 600 !important;
+    margin-bottom: 16px !important;
+    line-height: 1.3 !important;
+    color: #2C3E50 !important;
     display: block !important;
     visibility: visible !important;
     opacity: 1 !important;
@@ -620,12 +616,17 @@ body {
 }
 
 .detail-value {
-    color: var(--tg-theme-text-color) !important;
+    color: #2C3E50 !important;
     font-weight: 500;
     text-align: right;
     max-width: 60%;
+}
+
+.tg-modal-brand {
     display: inline-block !important;
     visibility: visible !important;
+    opacity: 1 !important;
+    color: #2C3E50 !important;
 }
 
 .stock-badge {
@@ -646,21 +647,20 @@ body {
 }
 
 .modal-price {
-    font-size: 28px;
-    font-weight: 700;
-    color: var(--primary-color);
-    margin: 20px 0;
-    text-align: center;
-    padding: 15px;
-    background: linear-gradient(135deg, #F5F7FA 0%, #EDF2F7 100%);
-    border-radius: 12px;
-    border: 1px solid #E2E8F0;
+    font-size: 28px !important;
+    font-weight: 700 !important;
+    color: var(--primary-color) !important;
+    margin: 20px 0 !important;
+    text-align: center !important;
+    padding: 15px !important;
+    background: linear-gradient(135deg, #F5F7FA 0%, #EDF2F7 100%) !important;
+    border-radius: 12px !important;
+    border: 1px solid #E2E8F0 !important;
     display: block !important;
     visibility: visible !important;
     opacity: 1 !important;
 }
 
-/* Улучшенное описание товара */
 .modal-description {
     margin-top: 15px;
     margin-bottom: 20px;
@@ -685,15 +685,10 @@ body {
     color: #4A5568;
     font-size: 14px;
     line-height: 1.6;
-    word-wrap: break-word;
-    overflow-wrap: break-word;
 }
 
-/* Скрываем пустое описание */
 .modal-description:empty {
     display: none !important;
-    margin: 0;
-    padding: 0;
 }
 
 .modal-actions {
@@ -741,7 +736,7 @@ body {
     display: none;
     text-align: center;
     padding: 40px;
-    background: white;
+    background: #FFFFFF !important;
 }
 
 .loader.active {
@@ -768,7 +763,7 @@ body {
     display: none;
     padding: 20px;
     text-align: center;
-    background: white;
+    background: #FFFFFF !important;
 }
 
 .load-more-container.visible {
@@ -801,7 +796,7 @@ body {
     display: none;
     text-align: center;
     padding: 60px 20px;
-    background: white;
+    background: #FFFFFF !important;
 }
 
 .empty-state.visible {
@@ -817,7 +812,7 @@ body {
 .empty-state h3 {
     font-size: 20px;
     margin-bottom: 10px;
-    color: var(--tg-theme-text-color);
+    color: #2C3E50 !important;
 }
 
 .empty-state p {
@@ -830,26 +825,25 @@ body {
 /* ====================== */
 
 @media (max-width: 480px) {
-    .product-image-wrapper {
-        height: 120px;
-        min-height: 120px;
-        max-height: 120px;
-        flex: 0 0 120px;
+    .tg-product-image-wrapper {
+        height: 120px !important;
+        min-height: 120px !important;
+        max-height: 120px !important;
+        flex: 0 0 120px !important;
     }
     
-    .product-info {
-        padding: 10px;
+    .tg-product-info {
+        padding: 10px !important;
     }
     
-    .product-name {
-        font-size: 13px;
-        min-height: 35px;
+    .tg-product-name {
+        font-size: 13px !important;
+        min-height: 35px !important;
     }
     
     .modal-content {
         width: 95%;
         max-height: 95vh;
-        margin: 10px;
     }
     
     .modal-image-container.with-image {
@@ -861,79 +855,26 @@ body {
         height: 120px;
         min-height: 120px;
     }
-    
-    .modal-image-container .no-image span {
-        font-size: 36px;
-    }
-    
-    .modal-image-container .no-image p {
-        font-size: 12px;
-    }
-    
-    .modal-info {
-        padding: 15px;
-    }
-    
-    .modal-info h2 {
-        font-size: 18px;
-    }
-    
-    .modal-description {
-        padding: 12px;
-        margin-top: 12px;
-        margin-bottom: 15px;
-    }
-    
-    .modal-description h4 {
-        font-size: 15px;
-    }
-    
-    .modal-description p {
-        font-size: 13px;
-    }
-    
-    .modal-price {
-        font-size: 24px;
-        padding: 12px;
-    }
 }
 
 @media (max-width: 360px) {
-    .product-image-wrapper {
-        height: 100px;
-        min-height: 100px;
-        max-height: 100px;
-        flex: 0 0 100px;
+    .tg-product-image-wrapper {
+        height: 100px !important;
+        min-height: 100px !important;
+        max-height: 100px !important;
+        flex: 0 0 100px !important;
     }
     
-    .product-info {
-        padding: 8px;
+    .tg-product-info {
+        padding: 8px !important;
     }
     
-    .product-name {
-        font-size: 12px;
-        min-height: 32px;
+    .tg-product-name {
+        font-size: 12px !important;
+        min-height: 32px !important;
     }
     
-    .product-price {
-        font-size: 16px;
-    }
-    
-    .modal-image-container.with-image {
-        height: 180px;
-        min-height: 180px;
-    }
-    
-    .modal-image-container.no-image-container {
-        height: 100px;
-        min-height: 100px;
-    }
-    
-    .modal-info h2 {
-        font-size: 16px;
-    }
-    
-    .modal-price {
-        font-size: 22px;
+    .tg-product-price {
+        font-size: 16px !important;
     }
 }

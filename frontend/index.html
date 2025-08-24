@@ -11,10 +11,169 @@
     <!-- Telegram Web App Script -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     
-    <!-- Стили с версией для обновления кэша -->
-    <link rel="stylesheet" href="styles.css?v=20250823_v5">
+    <!-- Принудительные инлайн стили для Telegram -->
+    <style>
+        /* КРИТИЧЕСКИЕ СТИЛИ ДЛЯ TELEGRAM */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background-color: #FFFFFF !important;
+            color: #2C3E50 !important;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif !important;
+        }
+        
+        /* Принудительный фикс для чекбокса */
+        .tg-checkbox-container {
+            display: inline-flex !important;
+            align-items: center !important;
+            position: relative !important;
+            cursor: pointer !important;
+            min-height: 24px !important;
+        }
+        
+        .tg-checkbox-container input {
+            position: absolute !important;
+            opacity: 0 !important;
+            width: 20px !important;
+            height: 20px !important;
+            cursor: pointer !important;
+            z-index: 2 !important;
+        }
+        
+        .tg-checkmark {
+            position: absolute !important;
+            left: 0 !important;
+            top: 2px !important;
+            width: 20px !important;
+            height: 20px !important;
+            border: 2px solid #DEE2E6 !important;
+            border-radius: 4px !important;
+            background: white !important;
+            pointer-events: none !important;
+        }
+        
+        .tg-checkbox-container input:checked ~ .tg-checkmark {
+            background: #5E72E4 !important;
+            border-color: #5E72E4 !important;
+        }
+        
+        .tg-checkbox-container input:checked ~ .tg-checkmark:after {
+            content: '' !important;
+            position: absolute !important;
+            display: block !important;
+            left: 6px !important;
+            top: 2px !important;
+            width: 5px !important;
+            height: 10px !important;
+            border: solid white !important;
+            border-width: 0 2px 2px 0 !important;
+            transform: rotate(45deg) !important;
+        }
+        
+        .tg-checkbox-text {
+            margin-left: 28px !important;
+            color: #2C3E50 !important;
+            font-size: 15px !important;
+            display: inline-block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+            user-select: none !important;
+        }
+        
+        /* Фикс для карточек товаров */
+        .tg-product-card {
+            background: white !important;
+            border-radius: 12px !important;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08) !important;
+            border: 1px solid #E5E7EB !important;
+            overflow: hidden !important;
+            cursor: pointer !important;
+            display: flex !important;
+            flex-direction: column !important;
+            height: 100% !important;
+        }
+        
+        .tg-product-image-wrapper {
+            width: 100% !important;
+            height: 160px !important;
+            min-height: 160px !important;
+            max-height: 160px !important;
+            overflow: hidden !important;
+            background: #F5F7FA !important;
+            flex: 0 0 160px !important;
+            display: block !important;
+        }
+        
+        .tg-product-info {
+            padding: 12px !important;
+            background: white !important;
+            flex: 1 !important;
+            display: block !important;
+        }
+        
+        .tg-product-brand {
+            font-size: 11px !important;
+            color: #6C757D !important;
+            text-transform: uppercase !important;
+            margin-bottom: 4px !important;
+            display: block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+        }
+        
+        .tg-product-name {
+            font-size: 14px !important;
+            font-weight: 500 !important;
+            color: #2C3E50 !important;
+            margin-bottom: 8px !important;
+            line-height: 1.4 !important;
+            display: block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+            min-height: 38px !important;
+        }
+        
+        .tg-product-price {
+            font-size: 18px !important;
+            font-weight: 600 !important;
+            color: #2C3E50 !important;
+            display: block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+        }
+        
+        /* Фикс для модального окна */
+        .tg-modal-title {
+            font-size: 20px !important;
+            font-weight: 600 !important;
+            color: #2C3E50 !important;
+            margin-bottom: 16px !important;
+            display: block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+        }
+        
+        .tg-modal-brand {
+            color: #2C3E50 !important;
+            font-weight: 500 !important;
+            display: inline-block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+        }
+    </style>
+    
+    <!-- Стили с новой версией -->
+    <link rel="stylesheet" href="styles.css?v=20250824_v6">
 </head>
-<body>
+<body style="background-color: #FFFFFF !important;">
+    
+    <!-- Белый слой для гарантии -->
+    <div style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: #FFFFFF; z-index: -1;"></div>
+    
     <!-- Шапка приложения -->
     <header class="header">
         <div class="header-content">
@@ -33,17 +192,18 @@
     </header>
 
     <!-- Поиск -->
-    <div class="search-container">
+    <div class="search-container" style="background: #FFFFFF !important;">
         <input 
             type="text" 
             class="search-input" 
             id="searchInput" 
             placeholder="🔍 Поиск по названию или модели..."
+            style="background: #F5F7FA !important; color: #2C3E50 !important;"
         >
     </div>
 
     <!-- Фильтр по брендам -->
-    <div class="brands-container">
+    <div class="brands-container" style="background: #FFFFFF !important;">
         <div class="brands-header">
             <h3>Бренды</h3>
             <button class="clear-filter" id="clearFilter">Сбросить</button>
@@ -53,33 +213,33 @@
         </div>
     </div>
 
-    <!-- Фильтр по наличию -->
-    <div class="availability-filter">
-        <label class="checkbox-container">
+    <!-- Фильтр по наличию с уникальными классами -->
+    <div class="availability-filter" style="background: #FFFFFF !important; padding: 15px;">
+        <label class="tg-checkbox-container" for="inStockOnly">
             <input type="checkbox" id="inStockOnly">
-            <span class="checkmark"></span>
-            <span class="checkbox-text">Только в наличии</span>
+            <span class="tg-checkmark"></span>
+            <span class="tg-checkbox-text">Только в наличии</span>
         </label>
     </div>
 
     <!-- Счетчик результатов -->
-    <div class="results-counter">
+    <div class="results-counter" style="background: #F5F7FA !important;">
         <span id="resultsCount">Показано: 0 товаров</span>
     </div>
 
     <!-- Сетка товаров -->
-    <div class="products-grid" id="productsGrid">
+    <div class="products-grid" id="productsGrid" style="background: #FAFBFC !important;">
         <!-- Карточки товаров будут добавлены динамически -->
     </div>
 
     <!-- Индикатор загрузки -->
-    <div class="loader" id="loader">
+    <div class="loader" id="loader" style="background: #FFFFFF !important;">
         <div class="spinner"></div>
         <span>Загрузка товаров...</span>
     </div>
 
-    <!-- Кнопка "Показать еще" для пагинации -->
-    <div class="load-more-container" id="loadMoreContainer">
+    <!-- Кнопка "Показать еще" -->
+    <div class="load-more-container" id="loadMoreContainer" style="background: #FFFFFF !important;">
         <button class="load-more-btn" id="loadMoreBtn">Показать еще</button>
     </div>
 
@@ -96,13 +256,13 @@
                 
                 <!-- Информация о товаре -->
                 <div class="modal-info">
-                    <h2 id="modalTitle"></h2>
+                    <h2 class="tg-modal-title" id="modalTitle"></h2>
                     
                     <!-- Детали товара -->
                     <div class="modal-details">
                         <div class="detail-item">
                             <span class="detail-label">Бренд:</span>
-                            <span class="detail-value" id="modalBrand"></span>
+                            <span class="detail-value tg-modal-brand" id="modalBrand"></span>
                         </div>
                         <div class="detail-item">
                             <span class="detail-label">Наличие:</span>
@@ -113,7 +273,7 @@
                     </div>
                     
                     <!-- Цена -->
-                    <div class="modal-price" id="modalPrice">
+                    <div class="modal-price" id="modalPrice" style="display: block !important; visibility: visible !important;">
                         <!-- Цена будет добавлена динамически -->
                     </div>
                     
@@ -134,13 +294,30 @@
     </div>
 
     <!-- Пустое состояние -->
-    <div class="empty-state" id="emptyState">
+    <div class="empty-state" id="emptyState" style="background: #FFFFFF !important;">
         <div class="empty-icon">🔍</div>
         <h3>Ничего не найдено</h3>
         <p>Попробуйте изменить параметры поиска или фильтры</p>
     </div>
 
-    <!-- Скрипты с версией для обновления кэша -->
-    <script src="app.js?v=20250823_v5"></script>
+    <!-- Скрипты с новой версией -->
+    <script src="app.js?v=20250824_v6"></script>
+    
+    <!-- Дополнительный скрипт для принудительной установки стилей -->
+    <script>
+        // Принудительно устанавливаем белый фон
+        document.addEventListener('DOMContentLoaded', function() {
+            document.body.style.backgroundColor = '#FFFFFF';
+            document.body.style.background = '#FFFFFF';
+            
+            // Проверяем видимость текста чекбокса
+            const checkboxText = document.querySelector('.tg-checkbox-text');
+            if (checkboxText) {
+                checkboxText.style.display = 'inline-block';
+                checkboxText.style.visibility = 'visible';
+                checkboxText.style.opacity = '1';
+            }
+        });
+    </script>
 </body>
 </html>
