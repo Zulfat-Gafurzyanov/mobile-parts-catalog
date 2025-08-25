@@ -1,19 +1,15 @@
-ssh localhost -p222
-cd ~/zulfat/mobile-parts-catalog
+cd ~/zulfat/mobile-parts-catalog || exit 1
 
-# Проверяем, не запущен ли уже бот
 if [ -f bot.pid ]; then
-    OLD_PID=$(cat bot.pid)
-    if ps -p $OLD_PID > /dev/null 2>&1; then
-        echo "Bot is already running with PID $OLD_PID"
-        exit 1
+    PID=$(cat bot.pid)
+    if ps -p $PID > /dev/null 2>&1; then
+        kill $PID
+        echo "Bot with PID $PID has been stopped"
+        rm bot.pid
+    else
+        echo "Bot is not running (stale PID file)"
+        rm bot.pid
     fi
+else
+    echo "Bot is not running (no PID file)"
 fi
-
-# Активируем виртуальное окружение
-source venv/bin/activate
-
-# Запускаем бота
-nohup python telegram_bot/main.py > logs/bot.log 2>&1 &
-echo $! > bot.pid
-echo "Bot started with PID $(cat bot.pid)"

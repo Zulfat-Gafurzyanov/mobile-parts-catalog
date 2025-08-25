@@ -209,3 +209,7 @@ public_html/
 
 # Git hooks
 .git/hooks/
+
+
+# Мои файлы
+start_bot_cron.sh
