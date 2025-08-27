@@ -728,6 +728,28 @@ body > * {
     transform: translateY(-1px);
 }
 
+/* Кнопка Telegram */
+.btn-telegram {
+    background: #5E72E4 !important;
+    background: -webkit-linear-gradient(135deg, #5E72E4 0%, #7B8FF5 100%) !important;
+    background: linear-gradient(135deg, #5E72E4 0%, #7B8FF5 100%) !important;
+    color: white !important;
+    box-shadow: 0 4px 12px rgba(94, 114, 228, 0.3) !important;
+    font-weight: 600 !important;
+    -webkit-tap-highlight-color: transparent !important;
+    touch-action: manipulation !important;
+}
+
+.btn-telegram:hover {
+    background: linear-gradient(135deg, #4C63D2 0%, #5E72E4 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(94, 114, 228, 0.4);
+}
+
+.btn-telegram svg {
+    filter: drop-shadow(0 1px 2px rgba(0,0,0,0.1));
+}
+
 /* ====================== */
 /* Загрузка и пагинация */
 /* ====================== */

@@ -23,7 +23,33 @@ let searchTimeout = null;
 // Инициализация Telegram Web App
 // ======================
 
-const tg = window.Telegram ? window.Telegram.WebApp : null;
+function initTelegramWebApp() {
+    if (window.Telegram && window.Telegram.WebApp) {
+        const tg = window.Telegram.WebApp;
+        
+        try {
+            tg.ready();
+            tg.expand();
+            
+            // Устанавливаем цвета
+            if (tg.setHeaderColor) {
+                tg.setHeaderColor('#5E72E4');
+            }
+            if (tg.setBackgroundColor) {
+                tg.setBackgroundColor('#FFFFFF');
+            }
+            
+            console.log('Telegram WebApp инициализирован');
+            return tg;
+        } catch (e) {
+            console.error('Ошибка инициализации Telegram WebApp:', e);
+        }
+    }
+    return null;
+}
+
+// Вызываем инициализацию
+const tg = initTelegramWebApp();
 
 function setupTelegramTheme() {
     console.log('Настройка темы для Telegram...');
@@ -78,15 +104,22 @@ async function loadCatalog() {
     showLoader(true);
     
     try {
-        console.log('Загружаем каталог...');
-        const response = await fetch('catalog.json?v=' + Date.now());
+        console.log('Начинаем загрузку каталога...');
+        
+        // Определяем базовый путь
+        const baseUrl = window.location.href.replace(/[^\/]*$/, '');
+        
+        // Пробуем абсолютный путь
+        const absoluteUrl = baseUrl + 'catalog.json?v=' + Date.now();
+        
+        const response = await fetch(absoluteUrl);
         
         if (!response.ok) {
-            throw new Error('Ошибка загрузки: ' + response.status);
+            throw new Error(`HTTP ${response.status}`);
         }
         
         catalogData = await response.json();
-        console.log('Загружено товаров:', catalogData.items.length);
+        console.log('Успешно загружено:', catalogData.items.length, 'товаров');
         
         processCatalogData();
         initializeUI();
@@ -94,8 +127,16 @@ async function loadCatalog() {
         displayProducts();
         
     } catch (error) {
-        console.error('Ошибка:', error);
-        showError('Не удалось загрузить каталог');
+        console.error('Ошибка загрузки:', error);
+        showError(`Ошибка загрузки: ${error.message}`);
+        
+        // Повтор через 2 секунды
+        setTimeout(() => {
+            if (!catalogData) {
+                console.log('Повторная попытка загрузки...');
+                loadCatalog();
+            }
+        }, 2000);
     } finally {
         showLoader(false);
     }
@@ -204,7 +245,7 @@ function setupEventListeners() {
     document.getElementById('clearFilter').addEventListener('click', clearFilters);
     document.getElementById('loadMoreBtn').addEventListener('click', loadMore);
     document.getElementById('modalClose').addEventListener('click', closeModal);
-    document.getElementById('modalCloseBtn').addEventListener('click', closeModal);
+    document.getElementById('contactManagerBtn').addEventListener('click', contactManager);
     document.getElementById('productModal').addEventListener('click', (e) => {
         if (e.target.id === 'productModal') closeModal();
     });
@@ -446,6 +487,28 @@ function showProductDetails(product) {
 function closeModal() {
     document.getElementById('productModal').classList.remove('active');
     document.body.style.overflow = '';
+}
+
+function contactManager() {
+    const managerLink = 'https://t.me/Ssfrp';
+    
+    // Проверяем наличие Telegram WebApp
+    if (window.Telegram && window.Telegram.WebApp) {
+        const tg = window.Telegram.WebApp;
+        
+        // Используем правильный метод для открытия ссылки
+        if (tg.openTelegramLink) {
+            tg.openTelegramLink(managerLink);
+        } else if (tg.openLink) {
+            tg.openLink(managerLink);
+        } else {
+            // Fallback для старых версий - прямой переход
+            window.location.href = managerLink;
+        }
+    } else {
+        // Для обычных браузеров - открываем в том же окне
+        window.location.href = managerLink;
+    }
 }
 
 function loadMore() {

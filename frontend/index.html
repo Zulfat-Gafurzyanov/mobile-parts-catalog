@@ -3,17 +3,54 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    
+    <!-- КРИТИЧНО: Отключаем кэширование -->
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
+    
     <title>Каталог запчастей</title>
     
     <!-- Telegram Web App Script -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     
-    <!-- Принудительные инлайн стили для Telegram -->
+    <!-- Версионирование для принудительного обновления -->
+    <script>
+        // Автоматическая версия на основе текущей даты и времени
+        const APP_VERSION = '2024.12.27.001';
+        const FORCE_REFRESH = true;
+        
+        // Проверяем версию в localStorage
+        const savedVersion = localStorage.getItem('app_version');
+        if (FORCE_REFRESH && savedVersion !== APP_VERSION) {
+            console.log('Обнаружена новая версия, очищаем кэш...');
+            
+            // Очищаем все кэши
+            localStorage.clear();
+            sessionStorage.clear();
+            
+            // Сохраняем новую версию
+            localStorage.setItem('app_version', APP_VERSION);
+            
+            // Очищаем service worker кэш если есть
+            if ('caches' in window) {
+                caches.keys().then(names => {
+                    names.forEach(name => caches.delete(name));
+                });
+            }
+            
+            // Перезагружаем страницу с очисткой кэша
+            if (window.location.reload) {
+                window.location.reload(true);
+            }
+        }
+        
+        // Динамическое добавление стилей и скриптов с версией
+        document.write('<link rel="stylesheet" href="styles.css?v=' + APP_VERSION + '">');
+    </script>
+    
+    <!-- Критические инлайн стили -->
     <style>
-        /* КРИТИЧЕСКИЕ СТИЛИ ДЛЯ TELEGRAM */
         * {
             margin: 0;
             padding: 0;
@@ -26,7 +63,6 @@
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif !important;
         }
         
-        /* Принудительный фикс для чекбокса */
         .tg-checkbox-container {
             display: inline-flex !important;
             align-items: center !important;
@@ -83,96 +119,17 @@
             opacity: 1 !important;
             user-select: none !important;
         }
-        
-        /* Фикс для карточек товаров */
-        .tg-product-card {
-            background: white !important;
-            border-radius: 12px !important;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08) !important;
-            border: 1px solid #E5E7EB !important;
-            overflow: hidden !important;
-            cursor: pointer !important;
-            display: flex !important;
-            flex-direction: column !important;
-            height: 100% !important;
-        }
-        
-        .tg-product-image-wrapper {
-            width: 100% !important;
-            height: 160px !important;
-            min-height: 160px !important;
-            max-height: 160px !important;
-            overflow: hidden !important;
-            background: #F5F7FA !important;
-            flex: 0 0 160px !important;
-            display: block !important;
-        }
-        
-        .tg-product-info {
-            padding: 12px !important;
-            background: white !important;
-            flex: 1 !important;
-            display: block !important;
-        }
-        
-        .tg-product-brand {
-            font-size: 11px !important;
-            color: #6C757D !important;
-            text-transform: uppercase !important;
-            margin-bottom: 4px !important;
-            display: block !important;
-            visibility: visible !important;
-            opacity: 1 !important;
-        }
-        
-        .tg-product-name {
-            font-size: 14px !important;
-            font-weight: 500 !important;
-            color: #2C3E50 !important;
-            margin-bottom: 8px !important;
-            line-height: 1.4 !important;
-            display: block !important;
-            visibility: visible !important;
-            opacity: 1 !important;
-            min-height: 38px !important;
-        }
-        
-        .tg-product-price {
-            font-size: 18px !important;
-            font-weight: 600 !important;
-            color: #2C3E50 !important;
-            display: block !important;
-            visibility: visible !important;
-            opacity: 1 !important;
-        }
-        
-        /* Фикс для модального окна */
-        .tg-modal-title {
-            font-size: 20px !important;
-            font-weight: 600 !important;
-            color: #2C3E50 !important;
-            margin-bottom: 16px !important;
-            display: block !important;
-            visibility: visible !important;
-            opacity: 1 !important;
-        }
-        
-        .tg-modal-brand {
-            color: #2C3E50 !important;
-            font-weight: 500 !important;
-            display: inline-block !important;
-            visibility: visible !important;
-            opacity: 1 !important;
-        }
     </style>
-    
-    <!-- Стили с новой версией -->
-    <link rel="stylesheet" href="styles.css?v=20250824_v6">
 </head>
 <body style="background-color: #FFFFFF !important;">
     
     <!-- Белый слой для гарантии -->
     <div style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: #FFFFFF; z-index: -1;"></div>
+    
+    <!-- Индикатор версии для отладки -->
+    <div style="position: fixed; bottom: 5px; right: 5px; font-size: 10px; color: #ccc; z-index: 9999;">
+        v<script>document.write(APP_VERSION)</script>
+    </div>
     
     <!-- Шапка приложения -->
     <header class="header">
@@ -213,7 +170,7 @@
         </div>
     </div>
 
-    <!-- Фильтр по наличию с уникальными классами -->
+    <!-- Фильтр по наличию -->
     <div class="availability-filter" style="background: #FFFFFF !important; padding: 15px;">
         <label class="tg-checkbox-container" for="inStockOnly">
             <input type="checkbox" id="inStockOnly">
@@ -249,16 +206,13 @@
             <button class="modal-close" id="modalClose">&times;</button>
             
             <div class="modal-body">
-                <!-- Контейнер для изображения -->
                 <div class="modal-image-container" id="modalImageWrapper">
                     <!-- Изображение будет добавлено динамически -->
                 </div>
                 
-                <!-- Информация о товаре -->
                 <div class="modal-info">
                     <h2 class="tg-modal-title" id="modalTitle"></h2>
                     
-                    <!-- Детали товара -->
                     <div class="modal-details">
                         <div class="detail-item">
                             <span class="detail-label">Бренд:</span>
@@ -272,20 +226,16 @@
                         </div>
                     </div>
                     
-                    <!-- Цена -->
-                    <div class="modal-price" id="modalPrice" style="display: block !important; visibility: visible !important;">
-                        <!-- Цена будет добавлена динамически -->
-                    </div>
+                    <div class="modal-price" id="modalPrice"></div>
                     
-                    <!-- Описание товара -->
-                    <div class="modal-description" id="modalDescription">
-                        <!-- Описание будет добавлено динамически если есть -->
-                    </div>
+                    <div class="modal-description" id="modalDescription"></div>
                     
-                    <!-- Кнопка закрытия -->
                     <div class="modal-actions">
-                        <button class="btn btn-primary" id="modalCloseBtn">
-                            ✕ Закрыть
+                        <button class="btn btn-telegram" id="contactManagerBtn">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.446 1.394c-.14.14-.357.272-.52.272-.232 0-.413-.089-.442-.242l-1.022-3.35-2.904-.88c-.631-.195-.641-.63.138-.935l11.308-4.357c.528-.196 1.035.133.862.92z"/>
+                            </svg>
+                            Написать менеджеру
                         </button>
                     </div>
                 </div>
@@ -300,8 +250,10 @@
         <p>Попробуйте изменить параметры поиска или фильтры</p>
     </div>
 
-    <!-- Скрипты с новой версией -->
-    <script src="app.js?v=20250824_v6"></script>
+    <!-- Скрипты с версионированием -->
+    <script>
+        document.write('<script src="app.js?v=' + APP_VERSION + '"><\/script>');
+    </script>
     
     <!-- Дополнительный скрипт для принудительной установки стилей -->
     <script>
@@ -317,6 +269,10 @@
                 checkboxText.style.visibility = 'visible';
                 checkboxText.style.opacity = '1';
             }
+            
+            // Показываем версию для отладки
+            console.log('App Version:', APP_VERSION);
+            console.log('Force Refresh Enabled:', FORCE_REFRESH);
         });
     </script>
 </body>
