@@ -2,6 +2,7 @@
 
 [![Python](https://img.shields.io/badge/Python-3.10%2B-blue.svg)](https://www.python.org/)
 [![Telegram Bot API](https://img.shields.io/badge/Telegram%20Bot%20API-6.0-blue.svg)](https://core.telegram.org/bots/api)
+[![aiogram](https://img.shields.io/badge/aiogram-3.21.0-green.svg)](https://docs.aiogram.dev/)
 
 Telegram Mini App для управления каталогом запчастей мобильных устройств с автоматической конвертацией Excel → JSON
 
