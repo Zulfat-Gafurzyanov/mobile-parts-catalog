@@ -4,6 +4,7 @@
 BOT_DIR="$HOME/zulfat/mobile-parts-catalog/telegram_bot"
 LOG_DIR="$BOT_DIR/logs"
 LOG_FILE="$LOG_DIR/bot.log"
+ERROR_LOG="$LOG_DIR/error.log"
 PID_FILE="$LOG_DIR/bot.pid"
 SSH_PORT=222
 
@@ -73,10 +74,12 @@ start() {
     # Создаем директорию для логов
     ensure_log_dir
     
-    # Запускаем бота через SSH
+    # Запускаем бота через SSH с правильным перенаправлением
+    # ВАЖНО: Не перенаправляем в /dev/null, а даем Python писать в файлы
     ssh localhost -p$SSH_PORT "cd $BOT_DIR && \
         source ../venv/bin/activate && \
-        nohup python3 -u main.py > /dev/null 2>&1 & \
+        export PYTHONUNBUFFERED=1 && \
+        nohup python3 main.py >> $LOG_FILE 2>> $ERROR_LOG & \
         echo \$! > $PID_FILE"
     
     # Ждем запуска
@@ -96,6 +99,11 @@ start() {
         echo -e "${RED}✗ Ошибка запуска бота${NC}"
         
         # Показываем ошибки из лога
+        if [ -f "$ERROR_LOG" ]; then
+            echo -e "\n${RED}Ошибки:${NC}"
+            tail -20 "$ERROR_LOG"
+        fi
+        
         if [ -f "$LOG_FILE" ]; then
             echo -e "\n${RED}Последние записи в логе:${NC}"
             tail -20 "$LOG_FILE"
@@ -161,6 +169,17 @@ logs() {
     tail -f "$LOG_FILE"
 }
 
+# Функция просмотра ошибок
+errors() {
+    if [ ! -f "$ERROR_LOG" ]; then
+        echo -e "${YELLOW}Файл ошибок не найден: $ERROR_LOG${NC}"
+        return 1
+    fi
+    
+    echo -e "${RED}Просмотр ошибок (Ctrl+C для выхода)...${NC}"
+    tail -f "$ERROR_LOG"
+}
+
 # Функция очистки логов
 clear_logs() {
     echo -e "${YELLOW}Очистка логов...${NC}"
@@ -173,6 +192,12 @@ clear_logs() {
     else
         echo -e "${YELLOW}Файл логов не найден${NC}"
     fi
+    
+    if [ -f "$ERROR_LOG" ]; then
+        tail -100 "$ERROR_LOG" > "$ERROR_LOG.tmp"
+        mv "$ERROR_LOG.tmp" "$ERROR_LOG"
+        echo -e "${GREEN}✓ Логи ошибок очищены${NC}"
+    fi
 }
 
 # Функция показа информации
@@ -180,6 +205,7 @@ info() {
     echo -e "${BLUE}=== Информация о боте ===${NC}"
     echo -e "${BLUE}Директория:${NC} $BOT_DIR"
     echo -e "${BLUE}Лог-файл:${NC} $LOG_FILE"
+    echo -e "${BLUE}Файл ошибок:${NC} $ERROR_LOG"
     echo -e "${BLUE}PID-файл:${NC} $PID_FILE"
     echo -e "${BLUE}SSH порт:${NC} $SSH_PORT"
     echo
@@ -203,6 +229,9 @@ case "$1" in
     logs)
         logs
         ;;
+    errors)
+        errors
+        ;;
     clear-logs)
         clear_logs
         ;;
@@ -210,13 +239,14 @@ case "$1" in
         info
         ;;
     *)
-        echo -e "${BLUE}Использование:${NC} $0 {start|stop|restart|status|logs|clear-logs|info}"
+        echo -e "${BLUE}Использование:${NC} $0 {start|stop|restart|status|logs|errors|clear-logs|info}"
         echo ""
         echo -e "  ${GREEN}start${NC}       - Запустить бота"
         echo -e "  ${RED}stop${NC}        - Остановить бота"
         echo -e "  ${YELLOW}restart${NC}     - Перезапустить бота"
         echo -e "  ${BLUE}status${NC}      - Проверить статус"
         echo -e "  ${BLUE}logs${NC}        - Показать логи в реальном времени"
+        echo -e "  ${RED}errors${NC}      - Показать ошибки"
         echo -e "  ${YELLOW}clear-logs${NC}  - Очистить старые логи"
         echo -e "  ${BLUE}info${NC}        - Показать полную информацию"
         exit 1
